@@ -64,7 +64,7 @@ class Tensorboard:
 
         # make confusion matrix
 
-        value_font_size = 140 // len(label_names)
+        value_font_size = 70 // len(label_names)
 
         if normalize:
             cm = cm.astype('float') * 10 / cm.sum(axis=1)[:, np.newaxis]
