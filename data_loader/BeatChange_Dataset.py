@@ -5,6 +5,7 @@ import pandas as pd
 import time
 import numpy as np
 import sys
+import random
 #from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
 
@@ -53,8 +54,8 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
             label = 'Not Change'
             for l in labels:
                 if l != 'None':
-                    label = l
-                    # label = 'Change'
+                    # label = l
+                    label = 'Change'
             cbin[label] += 1
             if RAW:
                 # process feature
@@ -98,21 +99,30 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
 
             feature = feature.T
 
-            self.features.append(feature)
-            # self.data_per_class[label].append(feature)
-            self.class_labels.append(self.class_to_number(label))
+            # self.features.append(feature)
+            self.data_per_class[label].append(feature)
+            # self.class_labels.append(self.class_to_number(label))
 
             pt += int(WIN_LEN * OVERLAPPING)
 
         print(cbin) # print data statistics
 
         # get the minimum number (nonzero) of data, down-sample the dataset
-        # minnumdata = np.inf
-        # for c in list(self.data_per_class.keys()):
-        #     if minnumdata > self.data_per_class[c] > 0:
-        #        minnumdata = self.data_per_class[c]
-        # for c in list(self.data_per_class.keys()):
-        #     print("here")
+        minnumdata = np.inf
+        for c in list(cbin.keys()):
+            if minnumdata > cbin[c] > 0:
+               minnumdata = cbin[c]
+        for c in list(self.data_per_class.keys()):
+            # randomly sample data
+            if cbin[c] > minnumdata:
+                sampled = random.sample(self.data_per_class[c], minnumdata)
+                self.features.extend(sampled)
+                for i in range(len(sampled)):
+                    self.class_labels.append(self.class_to_number(c))
+            else:
+                self.features.extend(self.data_per_class[c])
+                for i in range(len(self.data_per_class[c])):
+                    self.class_labels.append(self.class_to_number(c))
 
         self.features = np.array(self.features, dtype=np.float)
         self.class_labels = np.array(self.class_labels)
@@ -151,10 +161,10 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
 
     def class_to_number(self, label):
         dic = {'Not Change': 0,
-               '3beats_1': 1,
-               '3beats_2': 2,
-               '3beats_3':3
-               # 'Change': 1,
+               # '3beats_1': 1,
+               # '3beats_2': 2,
+               # '3beats_3':3
+               'Change': 1,
                }
         return dic[label]
 
