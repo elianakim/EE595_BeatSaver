@@ -45,6 +45,8 @@ def main():
         opt['learning_rate'] = conf.args.lr
     if conf.args.feat_eng:
         opt['raw'] = False
+    if conf.args.minmax:
+        opt['scale'] = True
     conf.args.opt = opt
 
     ################## Load model ##################
@@ -149,6 +151,8 @@ def parse_arguments(argv):
                         help='which gpu to use')
     parser.add_argument('--feat_eng', action='store_true',
                         help='Whether to use feature engineering or not')
+    parser.add_argument('--minmax', action='store_true',
+                        help='Whether to use minmax scaling or not')
 
     ### OPTIONAL ###
     parser.add_argument('--lr', type=float, default=None,
@@ -177,3 +181,5 @@ if __name__=='__main__':
     conf.args = parse_arguments(sys.argv[1:])
     set_seed()
     main()
+
+    # python main.py --type beat_change --dataset beat_original --model beat_change_model --method Src --log_suffix 211211_hr_feateng_2 --gpu_idx 3 --feat_eng
