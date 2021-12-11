@@ -5,7 +5,8 @@ import pandas as pd
 import time
 import numpy as np
 import sys
-from sklearn.preprocessing import MinMaxScaler
+#from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 
 sys.path.append('..')
 import conf
@@ -60,8 +61,8 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                 feature = self.df.iloc[pt:pt + WIN_LEN, 0:6].values
 
                 if SCALE:
-                    min_max_scaler = MinMaxScaler()
-                    feature_scaled = min_max_scaler.fit_transform(feature)
+                    scaler = StandardScaler()
+                    feature_scaled = scaler.fit_transform(feature)
                     feature = feature_scaled
 
             else:
@@ -91,8 +92,8 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                     feature[i,0:12] = arr
 
                 if SCALE:
-                    min_max_scaler = MinMaxScaler()
-                    feature_scaled = min_max_scaler.fit_transform(feature)
+                    scaler = StandardScaler()
+                    feature_scaled = scaler.fit_transform(feature)
                     feature = feature_scaled
 
             feature = feature.T
