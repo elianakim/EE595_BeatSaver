@@ -16,7 +16,7 @@ OVERLAPPING = opt['overlap_ratio'] # overlapping window
 
 class BeatChange_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='../dataset/20211211_debug_hr/accgyro.csv'):
+    def __init__(self, file='../dataset/20211211_f3_re_yewon/accgyro.csv'):
         print('Loading data...')
 
         st = time.time()
@@ -109,7 +109,7 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
         # df = df_feature.join(df_label)
         df_feature["label"] = df_label
         df = df_feature
-        df.to_csv('../dataset/20211211_debug_hr/feature_labeled.csv', index=False)
+        df.to_csv('../dataset/20211211_f3_re_yewon/feature_labeled.csv', index=False)
 
 
 
