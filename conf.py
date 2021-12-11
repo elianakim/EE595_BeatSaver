@@ -14,7 +14,7 @@ BeatChange_Opt = {
     'momentum': 0.9,
     'classes': ['Not Change', '3Beats_1', '3Beats_2', '3Beats_3'],
     'num_classes': 4,
-    'raw': False,
+    'raw': True,
     # 'classes': ['Not Change', 'Change'],
     # 'num_classes': 2,
 }

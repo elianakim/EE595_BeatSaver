@@ -43,6 +43,8 @@ def main():
 
     if conf.args.lr:
         opt['learning_rate'] = conf.args.lr
+    if conf.args.feat_eng:
+        opt['raw'] = False
     conf.args.opt = opt
 
     ################## Load model ##################
@@ -145,6 +147,8 @@ def parse_arguments(argv):
                         help='For test only, without training.')
     parser.add_argument('--gpu_idx', type=int, default=0,
                         help='which gpu to use')
+    parser.add_argument('--feat_eng', action='store_true',
+                        help='Whether to use feature engineering or not')
 
     ### OPTIONAL ###
     parser.add_argument('--lr', type=float, default=None,
