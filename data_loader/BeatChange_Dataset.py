@@ -13,7 +13,7 @@ import conf
 opt = conf.BeatChange_Opt
 WIN_LEN = opt['seq_len']
 RAW = opt['raw']    # raw data OR feature
-SCALE = True #opt['scale']
+SCALE = opt['scale']
 OVERLAPPING = opt['overlap_ratio'] # overlapping window
 
 class BeatChange_Dataset(torch.utils.data.Dataset):
@@ -24,6 +24,7 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
         st = time.time()
 
         self.features = None
+        self.data_per_class = None
         self.class_labels = None
         self.dataset = None
         self.classes = conf.BeatChange_Opt['classes']
@@ -37,8 +38,10 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
 
     def preprocessing(self):
         self.features = []
+        self.data_per_class = {'Not Change': [], '3beats_1': [], '3beats_2': [], '3beats_3': [], 'Change': []}
         self.class_labels = []
         pt = 0
+        cbin = {'Not Change': 0, '3beats_1': 0, '3beats_2': 0, '3beats_3': 0, 'Change': 0}
         while pt + WIN_LEN <= len(self.df):
             bt = time.time()
             # decide label
@@ -51,7 +54,7 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                 if l != 'None':
                     label = l
                     # label = 'Change'
-
+            cbin[label] += 1
             if RAW:
                 # process feature
                 feature = self.df.iloc[pt:pt + WIN_LEN, 0:6].values
@@ -92,13 +95,23 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                     feature_scaled = min_max_scaler.fit_transform(feature)
                     feature = feature_scaled
 
-
             feature = feature.T
 
             self.features.append(feature)
+            # self.data_per_class[label].append(feature)
             self.class_labels.append(self.class_to_number(label))
 
             pt += int(WIN_LEN * OVERLAPPING)
+
+        print(cbin) # print data statistics
+
+        # get the minimum number (nonzero) of data, down-sample the dataset
+        # minnumdata = np.inf
+        # for c in list(self.data_per_class.keys()):
+        #     if minnumdata > self.data_per_class[c] > 0:
+        #        minnumdata = self.data_per_class[c]
+        # for c in list(self.data_per_class.keys()):
+        #     print("here")
 
         self.features = np.array(self.features, dtype=np.float)
         self.class_labels = np.array(self.class_labels)
@@ -137,10 +150,10 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
 
     def class_to_number(self, label):
         dic = {'Not Change': 0,
-               # 'Change': 1,
                '3beats_1': 1,
                '3beats_2': 2,
-               '3beats_3': 3,
+               '3beats_3':3
+               # 'Change': 1,
                }
         return dic[label]
 

@@ -3,19 +3,19 @@ args = None
 BeatChange_Opt = {
     'name': 'beat_change',
     'label_index': 6,
-    'batch_size': 64,
+    'batch_size': 32,
     'sampling_rate': 119,
-    'seq_len': 30,
-    'overlap_ratio': 1.0,
-    'file_path': './dataset/20211211_debug_hr/accgyro.csv',
+    'seq_len': 40,
+    'overlap_ratio': 0.5,
+    'file_path': './dataset/20211211_f3_re_yewon/accgyro.csv',
     'input_dim': 6,
     'learning_rate': 0.001,
     'weight_decay': 0.0001,
     'momentum': 0.9,
     'classes': ['Not Change', '3Beats_1', '3Beats_2', '3Beats_3'],
     'num_classes': 4,
-    'raw': False,
-    'scale': True
+    'raw': True,
+    'scale': False
     # 'classes': ['Not Change', 'Change'],
     # 'num_classes': 2,
 }
