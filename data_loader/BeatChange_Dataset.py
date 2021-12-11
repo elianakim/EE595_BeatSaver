@@ -5,6 +5,7 @@ import pandas as pd
 import time
 import numpy as np
 import sys
+from sklearn.preprocessing import MinMaxScaler
 
 sys.path.append('..')
 import conf
@@ -12,6 +13,7 @@ import conf
 opt = conf.BeatChange_Opt
 WIN_LEN = opt['seq_len']
 RAW = opt['raw']    # raw data OR feature
+SCALE = True #opt['scale']
 OVERLAPPING = opt['overlap_ratio'] # overlapping window
 
 class BeatChange_Dataset(torch.utils.data.Dataset):
@@ -54,6 +56,11 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                 # process feature
                 feature = self.df.iloc[pt:pt + WIN_LEN, 0:6].values
 
+                if SCALE:
+                    min_max_scaler = MinMaxScaler()
+                    feature_scaled = min_max_scaler.fit_transform(feature)
+                    feature = feature_scaled
+
             else:
                 # process feature
                 raw = self.df.iloc[pt:pt + WIN_LEN, 0:6].values
@@ -80,6 +87,11 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
 
                     feature[i,0:12] = arr
 
+                if SCALE:
+                    min_max_scaler = MinMaxScaler()
+                    feature_scaled = min_max_scaler.fit_transform(feature)
+                    feature = feature_scaled
+
 
             feature = feature.T
 
@@ -95,6 +107,7 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                                                        torch.from_numpy(self.class_labels))
 
         # Export numpy to csv
+        '''
         for i in range(self.features.shape[0]):
             if i is 0:
                 df_feature = pd.DataFrame(self.features[i].T)
@@ -105,12 +118,13 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                               'gyro_x', 'gyro_y', 'gyro_z', 'gyro_mean', 'gyro_std', 'gyro_var']
         df_label = pd.DataFrame(self.class_labels)
         df_label.columns = ['label']
-
-        # df = df_feature.join(df_label)
+        
         df_feature["label"] = df_label
         df = df_feature
+        
+        # make csv file
         df.to_csv('../dataset/20211211_f3_re_yewon/feature_labeled.csv', index=False)
-
+        '''
 
 
     def __len__(self):
