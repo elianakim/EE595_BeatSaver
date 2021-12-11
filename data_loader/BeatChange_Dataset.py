@@ -47,7 +47,8 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
             label = 'Not Change'
             for l in labels:
                 if l != 'None':
-                    label = 'Change'
+                    label = l
+                    # label = 'Change'
 
             if RAW:
                 # process feature
@@ -93,6 +94,25 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
         self.dataset = torch.utils.data.TensorDataset(torch.from_numpy(self.features).float(),
                                                        torch.from_numpy(self.class_labels))
 
+        # Export numpy to csv
+        for i in range(self.features.shape[0]):
+            if i is 0:
+                df_feature = pd.DataFrame(self.features[i].T)
+            else:
+                df_feature = df_feature.append(pd.DataFrame(self.features[i].T))
+        #df_feature = pd.DataFrame(self.features.T)
+        df_feature.columns = ['acc_x', 'acc_y','acc_z','acc_mean','acc_std','acc_var',
+                              'gyro_x', 'gyro_y', 'gyro_z', 'gyro_mean', 'gyro_std', 'gyro_var']
+        df_label = pd.DataFrame(self.class_labels)
+        df_label.columns = ['label']
+
+        # df = df_feature.join(df_label)
+        df_feature["label"] = df_label
+        df = df_feature
+        df.to_csv('../dataset/20211211_debug_hr/feature_labeled.csv', index=False)
+
+
+
     def __len__(self):
         return len(self.dataset)
 
@@ -103,7 +123,10 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
 
     def class_to_number(self, label):
         dic = {'Not Change': 0,
-               'Change': 1,
+               # 'Change': 1,
+               '3beats_1': 1,
+               '3beats_2': 2,
+               '3beats_3': 3,
                }
         return dic[label]
 
