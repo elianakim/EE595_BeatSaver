@@ -11,6 +11,7 @@ import conf
 
 opt = conf.BeatChange_Opt
 WIN_LEN = opt['seq_len']
+RAW = opt['raw']    # raw data OR feature
 OVERLAPPING = opt['overlap_ratio'] # overlapping window
 
 class BeatChange_Dataset(torch.utils.data.Dataset):
@@ -47,8 +48,38 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
             for l in labels:
                 if l != 'None':
                     label = 'Change'
-            # process feature
-            feature = self.df.iloc[pt:pt + WIN_LEN, 0:6].values
+
+            if RAW:
+                # process feature
+                feature = self.df.iloc[pt:pt + WIN_LEN, 0:6].values
+
+            else:
+                # process feature
+                raw = self.df.iloc[pt:pt + WIN_LEN, 0:6].values
+                feature = np.zeros((WIN_LEN, 12)) #[None] * WIN_LEN
+
+                # Split raw data into acc and gyro
+                raw_acc = raw[0:WIN_LEN, 0:3]
+                raw_gyro = raw[0:WIN_LEN, 3:6]
+                ## np.std(raw[0:WIN_LEN, 0]) # Calculate the std value of each axis within WIN_LEN
+
+                for i in range(WIN_LEN):
+                    acc_mean = np.mean(raw[i,0:3])
+                    acc_std = np.std(raw[i,0:3])
+                    acc_var = np.var(raw[i,0:3])
+
+                    gyro_mean = np.mean(raw[i,3:6])
+                    gyro_std = np.std(raw[i,3:6])
+                    gyro_var = np.var(raw[i,3:6])
+
+                    # arr includes raw_acc and feature_acc
+                    arr = np.append(np.array(raw_acc[i]),np.array([acc_mean, acc_std, acc_var]))
+                    # arr includes raw_acc, feature_acc, raw_gyro, and feature_gyro
+                    arr = np.append(arr,np.append(np.array(raw_gyro[i]), np.array([gyro_mean, gyro_std, gyro_var])))
+
+                    feature[i,0:12] = arr
+
+
             feature = feature.T
 
             self.features.append(feature)
