@@ -3,11 +3,11 @@ args = None
 BeatChange_Opt = {
     'name': 'beat_change',
     'label_index': 6,
-    'batch_size': 32,
+    'batch_size': 64,
     'sampling_rate': 119,
     'seq_len': 30,
     'overlap_ratio': 0.5,
-    'file_path': './dataset/20211210_debug2/accgyro.csv',
+    'file_path': './dataset/20211211_debug_hr/accgyro.csv',
     'input_dim': 6,
     'learning_rate': 0.001,
     'weight_decay': 0.0001,

@@ -37,6 +37,9 @@ class DNN():
         self.optimizer = optim.Adam([{'params': self.feature_extractor.parameters()},
                                      {'params': self.class_classifier.parameters()}], lr=conf.args.opt['learning_rate'],
                                     weight_decay=conf.args.opt['weight_decay'])
+        # self.optimizer = optim.SGD([{'params': self.feature_extractor.parameters()},
+        #                              {'params': self.class_classifier.parameters()}], lr=conf.args.opt['learning_rate'],
+        #                            weight_decay=conf.args.opt['weight_decay'])
 
     def save_checkpoint(self, epoch, epoch_acc, best_acc, checkpoint_path):
         state = {}
@@ -240,11 +243,14 @@ class DNN():
 
                 input_of_test_data, class_label_of_test_data = self.get_label_and_data(test_data)
                 feature_of_test_data = self.get_feature(self.feature_extractor, input_of_test_data)
-                class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
+                try:
+                    class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
                                                                                     self.class_classifier,
                                                                                     self.class_criterion,
                                                                                     feature_of_test_data,
                                                                                     class_label_of_test_data)
+                except:
+                    print(feature_of_test_data.shape)
 
                 class_loss_sum += float(class_loss_of_test_data * input_of_test_data.size(0))
                 class_cm_test_data_sum += class_cm_test_data

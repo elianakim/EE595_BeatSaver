@@ -15,7 +15,7 @@ OVERLAPPING = opt['overlap_ratio'] # overlapping window
 
 class BeatChange_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='../dataset/20211210_debug2/accgyro.csv'):
+    def __init__(self, file='../dataset/20211211_debug_hr/accgyro.csv'):
         print('Loading data...')
 
         st = time.time()

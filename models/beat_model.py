@@ -9,6 +9,8 @@ import conf
 device = torch.device("cuda:{:d}".format(conf.args.gpu_idx) if torch.cuda.is_available() else "cpu")
 # device = torch.device("cuda:{:d}".format(0) if torch.cuda.is_available() else "cpu")
 
+# feature_flatten_dim = 2048
+# feature_flatten_dim = 1664
 feature_flatten_dim = 2048
 input_channel_dim = 6
 
