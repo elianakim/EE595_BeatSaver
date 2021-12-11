@@ -6,14 +6,16 @@ BeatChange_Opt = {
     'batch_size': 64,
     'sampling_rate': 119,
     'seq_len': 30,
-    'overlap_ratio': 0.5,
+    'overlap_ratio': 1.0,
     'file_path': './dataset/20211211_debug_hr/accgyro.csv',
     'input_dim': 6,
     'learning_rate': 0.001,
     'weight_decay': 0.0001,
     'momentum': 0.9,
-    'classes': ['Not Change', 'Change'],
-    'num_classes': 2,
+    'classes': ['Not Change', '3Beats_1', '3Beats_2', '3Beats_3'],
+    'num_classes': 4,
+    # 'classes': ['Not Change', 'Change'],
+    # 'num_classes': 2,
 }
 
 BeatType_Opt = {
