@@ -2,6 +2,7 @@ from pydub import AudioSegment
 from pydub.playback import play
 import re
 import time
+import os
 
 def main():
     beats = []
@@ -12,11 +13,49 @@ def main():
         beats.append(beat)
 
     beep = AudioSegment.from_mp3("tick.mp3")
-    beep = beep[len(beep) / 3: len(beep) / 3 * 2]
+    beep = beep[0: len(beep) / 3.5]
+
+    os.system('clear')
 
     for beat in beats:
         if beat > 0:
-            play(beep)
+            print("##########")
+            print("##########")
+            print("##########")
+            print("##########")
+            print("##########")
+            print("##########")
+            time.sleep(0.33)
+            os.system('clear')
+
+        # if beat == 1: 
+        #     print("----------")
+        #     print("--#####---")
+        #     print("----###---")
+        #     print("----###---")
+        #     print("----###---")
+        #     print("--#######-")
+        #     time.sleep(0.33)
+        #     os.system('clear')
+        #     # play(beep)
+        # elif beat == 2:
+        #     print("-########-")
+        #     print("------###-")
+        #     print("-########-")
+        #     print("-###------")
+        #     print("-###------")
+        #     print("-########-")
+        #     time.sleep(0.33)
+        #     os.system('clear')
+        # elif beat == 3:
+        #     print("#########-")
+        #     print("------###-")
+        #     print("-########-")
+        #     print("------###-")
+        #     print("#########-")
+        #     print("----------")
+        #     time.sleep(0.33)
+        #     os.system('clear')
         else: # beat is 0
             # wait for 330ms
             time.sleep(0.33)
