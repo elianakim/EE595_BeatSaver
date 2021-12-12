@@ -90,25 +90,6 @@ class Class_Classifier(nn.Module):
     def get_parameters(self):
         return [{"params": self.class_classifier.parameters(), "lr_mult": 10, 'decay_mult': 2}]
 
-class GradReverse(torch.autograd.Function):
-    """
-    Extension of grad reverse layer
-    """
-
-    @staticmethod
-    def forward(ctx, x, constant):
-        ctx.constant = constant
-        return x.view_as(x)
-
-    @staticmethod
-    def backward(ctx, grad_output):
-        grad_output = grad_output.neg() * ctx.constant
-        return grad_output, None
-
-    def grad_reverse(x, constant):
-        return GradReverse.apply(x, constant)
-
-
 if __name__ == '__main__':
     fe = Extractor()
     cc = Class_Classifier()
