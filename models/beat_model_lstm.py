@@ -19,9 +19,15 @@ class Extractor(nn.Module): # LSTM extractor
     def __init__(self):
         super(Extractor, self).__init__()
 
-        self.hidden_dim = conf.BeatChange_LSTM_Opt['hidden_dim']
-        self.num_layers = conf.BeatChange_LSTM_Opt['num_lstm_layers']
-        self.num_directions = 2 if conf.BeatChange_LSTM_Opt['bidirectional'] else 1
+        if conf.args.beat_type == 3:
+            opt = conf.Beat3Change_LSTM_Opt
+        elif conf.args.beat_type == 4:
+            opt = conf.Beat4Change_LSTM_Opt
+
+
+        self.hidden_dim = opt['hidden_dim']
+        self.num_layers = opt['num_lstm_layers']
+        self.num_directions = 2 if opt['bidirectional'] else 1
         self.hidden = self.init_hidden()
 
         self.feature = nn.LSTM(
@@ -30,7 +36,7 @@ class Extractor(nn.Module): # LSTM extractor
             num_layers = self.num_layers,
             bias = True,
             batch_first = True,
-            bidirectional = conf.BeatChange_LSTM_Opt['bidirectional'],
+            bidirectional = opt['bidirectional'],
         )
 
     def init_hidden(self, batch_size=1):
@@ -48,16 +54,21 @@ class Class_Classifier(nn.Module):
     def __init__(self):
         super(Class_Classifier, self).__init__()
 
-        self.hidden_dim = conf.BeatChange_LSTM_Opt['hidden_dim']
-        self.num_layers = conf.BeatChange_LSTM_Opt['num_lstm_layers']
-        self.num_directions = 2 if conf.BeatChange_LSTM_Opt['bidirectional'] else 1
+        if conf.args.beat_type == 3:
+            opt = conf.Beat3Change_LSTM_Opt
+        elif conf.args.beat_type == 4:
+            opt = conf.Beat4Change_LSTM_Opt
+
+        self.hidden_dim = opt['hidden_dim']
+        self.num_layers = opt['num_lstm_layers']
+        self.num_directions = 2 if opt['bidirectional'] else 1
         self.feature_flatten_dim = self.hidden_dim * self.num_directions
 
         self.class_classifier = nn.Sequential(
             nn.Linear(self.feature_flatten_dim, 30),
             nn.ReLU(True),
             # nn.Dropout(0.5),
-            nn.Linear(30, conf.BeatChange_LSTM_Opt['num_classes'])
+            nn.Linear(30, opt['num_classes'])
         )
 
     def forward(self, input):

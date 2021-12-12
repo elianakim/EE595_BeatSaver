@@ -106,7 +106,7 @@ BeatType_Opt = {
     'num_classes': 3,
 }
 
-BeatChange_LSTM_Opt = {
+Beat3Change_LSTM_Opt = {
     'activation': 'dropout',
     'batch_size': 32,
     'hidden_dim': 100,
@@ -117,6 +117,20 @@ BeatChange_LSTM_Opt = {
     'tanh': False,
     'classes': ['Not Change', '3Beats_1', '3Beats_2', '3Beats_3'],
     'num_classes': 4,
+    'bidirectional': False,
+}
+
+Beat4Change_LSTM_Opt = {
+    'activation': 'dropout',
+    'batch_size': 32,
+    'hidden_dim': 100,
+    'linear_arch': 'light',
+    'loss': 'l1',
+    'lr': 0.001,
+    'num_lstm_layers': 3,
+    'tanh': False,
+    'classes': ['Not Change', '4Beats_1', '4Beats_2', '4Beats_3', '4beats_4'],
+    'num_classes': 5,
     'bidirectional': False,
 }
 

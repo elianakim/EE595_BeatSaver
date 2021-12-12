@@ -124,7 +124,8 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                     feature = feature_scaled
 
             feature = feature.T
-            feature_label = feature_label.T
+            if not RAW:
+                feature_label = feature_label.T
 
             if conf.args.downsample:
                 self.data_per_class[label].append(feature)
