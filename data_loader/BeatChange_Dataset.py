@@ -20,7 +20,7 @@ OVERLAPPING = opt['overlap_ratio'] # overlapping window
 
 class BeatChange_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='../dataset/20211211_f3_re_yewon/accgyro.csv'):
+    def __init__(self, file='../dataset/20211211_meta/accgyro.csv'):
         print('Loading data...')
 
         st = time.time()
@@ -54,8 +54,8 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
             label = 'Not Change'
             for l in labels:
                 if l != 'None':
-                    # label = l
-                    label = 'Change'
+                    label = l
+                    # label = 'Change'
             cbin[label] += 1
             if RAW:
                 # process feature
@@ -161,10 +161,10 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
 
     def class_to_number(self, label):
         dic = {'Not Change': 0,
-               # '3beats_1': 1,
-               # '3beats_2': 2,
-               # '3beats_3':3
-               'Change': 1,
+               '3beats_1': 1,
+               '3beats_2': 2,
+               '3beats_3':3
+               # 'Change': 1,
                }
         return dic[label]
 

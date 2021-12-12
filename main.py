@@ -53,6 +53,8 @@ def main():
     model = None
     if conf.args.model == 'beat_change_model':
         import models.beat_model as model
+    elif conf.args.model == 'beat_change_model_light':
+        import models.beat_model_light as model
     elif conf.args.model == 'beat_type_model':
         import models.beat_model as model
 
@@ -142,7 +144,7 @@ def parse_arguments(argv):
     parser.add_argument('--dataset', type=str, default='',
                         help='Dataset to be used, in [beat_original].')
     parser.add_argument('--model', type=str, default='beat_model',
-                        help='Model to be used.')
+                        help='Model to be used, in [beat_change_model, beat_change_model_light, beat_type_model].')
     parser.add_argument('--method', type=str, default='',
                         help='Src')
     parser.add_argument('--test_only', action='store_true',

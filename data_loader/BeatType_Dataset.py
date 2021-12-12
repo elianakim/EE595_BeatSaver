@@ -47,7 +47,8 @@ class BeatType_Dataset(torch.utils.data.Dataset):
             label = 'Not Change'
             for l in labels:
                 if l != 'None':
-                    label = 'Change'
+                    label = l
+                    # label = 'Change'
             # TODO: UNTIL HERE
             # process feature
             feature = self.df.iloc[pt:pt + WIN_LEN, 0:6].values
@@ -74,7 +75,10 @@ class BeatType_Dataset(torch.utils.data.Dataset):
 
     def class_to_number(self, label):
         dic = {'Not Change': 0,
-               'Change': 1,
+               '3Beats_1': 1,
+               '3Beats_2': 2,
+               '3Beats_3':3
+               # 'Change': 1,
                }
         return dic[label]
 

@@ -11,7 +11,7 @@ device = torch.device("cuda:{:d}".format(conf.args.gpu_idx) if torch.cuda.is_ava
 
 # feature_flatten_dim = 2048
 # feature_flatten_dim = 1664
-feature_flatten_dim = 14848
+feature_flatten_dim = 2048
 if conf.args.feat_eng:
     input_channel_dim = 12
 else:
@@ -24,31 +24,44 @@ class Extractor(nn.Module):
         super(Extractor, self).__init__()
 
         self.feature = nn.Sequential(
-            nn.Conv1d(input_channel_dim, 32, kernel_size=3),
+            nn.Conv1d(input_channel_dim, 32, kernel_size=3, stride=2),
             nn.ReLU(True),
             nn.BatchNorm1d(32),
 
+            nn.Conv1d(32, 32, kernel_size=3),
+            nn.ReLU(True),
+            nn.BatchNorm1d(32),
 
-            nn.Conv1d(32, 64, kernel_size=3),
+            nn.Conv1d(32, 64, kernel_size=3, stride=2),
+            nn.ReLU(True),
+            nn.BatchNorm1d(64),
+
+            nn.Conv1d(64, 64, kernel_size=3),
             nn.ReLU(True),
             nn.BatchNorm1d(64),
 
 
-            nn.Conv1d(64, 128, kernel_size=3),
-            nn.MaxPool1d(2),
+            nn.Conv1d(64, 128, kernel_size=3, stride=2),
+            nn.ReLU(True),
             nn.BatchNorm1d(128),
-            nn.ReLU(True),
+            #
+            #
+            # nn.Conv1d(128, 128, kernel_size=3),
+            # nn.ReLU(True),
+            # # nn.Dropout(0.1),
+            # nn.BatchNorm1d(128),
+            #
+            # nn.Conv1d(128, 256, kernel_size=3, stride=2),
+            # nn.ReLU(True),
+            # # nn.Dropout(0.1),
+            # nn.BatchNorm1d(256),
+            #
+            # nn.Conv1d(256, 256, kernel_size=3),
+            # nn.ReLU(True),
+            # # nn.Dropout(0.1),
+            # nn.BatchNorm1d(256),
 
-
-            nn.Conv1d(128, 256, kernel_size=3),
-            nn.ReLU(True),
-            nn.BatchNorm1d(256),
-
-
-            nn.Conv1d(256, 512, kernel_size=3),
             nn.MaxPool1d(2),
-            nn.ReLU(True),
-            nn.BatchNorm1d(512),
         )
 
     def forward(self, input):
@@ -66,15 +79,7 @@ class Class_Classifier(nn.Module):
     def __init__(self):
         super(Class_Classifier, self).__init__()
         self.class_classifier = nn.Sequential(
-            nn.Linear(feature_flatten_dim, 1024),
-            nn.ReLU(True),
-            nn.BatchNorm1d(1024),
-
-            nn.Linear(1024, 256),
-            nn.ReLU(True),
-            nn.BatchNorm1d(256),
-
-            nn.Linear(256, conf.args.opt['num_classes']))
+            nn.Linear(feature_flatten_dim, 2)) #conf.args.opt['num_class'])
 
     def forward(self, input):
         out = self.class_classifier(input)
@@ -89,25 +94,6 @@ class Class_Classifier(nn.Module):
 
     def get_parameters(self):
         return [{"params": self.class_classifier.parameters(), "lr_mult": 10, 'decay_mult': 2}]
-
-class GradReverse(torch.autograd.Function):
-    """
-    Extension of grad reverse layer
-    """
-
-    @staticmethod
-    def forward(ctx, x, constant):
-        ctx.constant = constant
-        return x.view_as(x)
-
-    @staticmethod
-    def backward(ctx, grad_output):
-        grad_output = grad_output.neg() * ctx.constant
-        return grad_output, None
-
-    def grad_reverse(x, constant):
-        return GradReverse.apply(x, constant)
-
 
 if __name__ == '__main__':
     fe = Extractor()

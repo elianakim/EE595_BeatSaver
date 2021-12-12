@@ -41,6 +41,11 @@ class DNN():
         #                              {'params': self.class_classifier.parameters()}], lr=conf.args.opt['learning_rate'],
         #                            weight_decay=conf.args.opt['weight_decay'])
 
+        # learning rate scheduler
+        self.scheduler = optim.lr_scheduler.StepLR(self.optimizer,
+                                                   step_size=100,
+                                                   gamma=0.5)
+
     def save_checkpoint(self, epoch, epoch_acc, best_acc, checkpoint_path):
         state = {}
         state['epoch'] = epoch
@@ -177,6 +182,7 @@ class DNN():
                 class_loss_sum += float(class_loss * input_of_labeled_data.size(0))
                 class_loss.backward()
                 self.optimizer.step()
+                self.scheduler.step()
 
         # if conf.args.method in ['Tgt', 'Src_Tgt', 'FT_FC', 'FT_all']:
         #
