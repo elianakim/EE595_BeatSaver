@@ -310,29 +310,32 @@ class DNN():
                 plt.show()
                 plt.savefig('PCA.png', dpi=300)
 
-                class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
-                    self.class_classifier,
-                    self.class_criterion,
-                    feature_of_test_data,
-                    class_label_of_test_data)
-                # try:
-                #     class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
-                #                                                                     self.class_classifier,
-                #                                                                     self.class_criterion,
-                #                                                                     feature_of_test_data,
-                #                                                                     class_label_of_test_data)
-                # except:
-                #     print(feature_of_test_data.shape)
 
-                class_loss_sum += float(class_loss_of_test_data * input_of_test_data.size(0))
-                class_cm_test_data_sum += class_cm_test_data
+    def demo_produce(self):
+        self.feature_extractor.eval()
+        self.class_classifier.eval()
 
-        epoch_avg_loss = self.log_loss_results(condition, epoch=epoch, loss_avg=class_loss_sum / num_iter)
-        class_accuracy_of_test_data = self.log_accuracy_results(condition, suffix='test', epoch=epoch, cm_class=class_cm_test_data_sum)
-        self.logger('loss', epoch_avg_loss, epoch, condition)
-        self.logger('accuracy', class_accuracy_of_test_data, epoch, condition)
+        save_path = conf.args.load_checkpoint_path[:-3]
+        filename = 'beats.txt'
+        f = open(save_path+filename, 'w')
 
-        return class_accuracy_of_test_data, epoch_avg_loss, class_cm_test_data_sum
+        num_iter = len(self.source_dataloader)
+        with torch.no_grad():
+            for batch_idx, test_data in tqdm(enumerate(self.source_dataloader), total=num_iter):
+                input_of_test_data, class_label_of_test_data = self.get_label_and_data(test_data)
+
+                if conf.args.model == 'beat_change_model_lstm':
+                    # reshape data from (batchsize, #feature, #sequence) to (batchsize, #sequence, #feature)
+                    input_of_test_data = torch.reshape(input_of_test_data, (input_of_test_data.shape[0],
+                                                                            input_of_test_data.shape[2],
+                                                                            input_of_test_data.shape[1]))
+                    self.feature_extractor.hidden = self.feature_extractor.init_hidden(batch_size=input_of_test_data.size(0))
+                feature_of_test_data = self.get_feature(self.feature_extractor, input_of_test_data)
+                preds_of_data = self.class_classifier(feature_of_test_data)
+                pred_label = preds_of_data.max(1, keepdim=False)[1]
+                write_str = str(batch_idx) + " , " + str(pred_label.item()) + "\n"
+                f.write(write_str)
+        f.close()
 
     def evaluation(self, epoch, condition):
 
@@ -351,6 +354,7 @@ class DNN():
                 test_data[1] = test_data[1].view(-1)
 
                 input_of_test_data, class_label_of_test_data = self.get_label_and_data(test_data)
+
                 if conf.args.model == 'beat_change_model_lstm':
                     # reshape data from (batchsize, #feature, #sequence) to (batchsize, #sequence, #feature)
                     input_of_test_data = torch.reshape(input_of_test_data, (input_of_test_data.shape[0],

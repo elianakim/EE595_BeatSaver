@@ -37,7 +37,10 @@ def main():
 
     ################## Load default hyperparameter ##################
     if 'beat_change' in conf.args.type:
-        opt = conf.BeatChange_Opt
+        if conf.args.demo_produce:
+            opt = conf.BeatChange_Demo_Opt
+        else:
+            opt = conf.BeatChange_Opt
     elif 'beat_type' in conf.args.type:
         opt = conf.BeatType_Opt
 
@@ -70,8 +73,8 @@ def main():
         if conf.args.pca:
             dataloader = data_loader.single_domain_data_loader(conf.args.opt['file_path'],
                                                                 batch_size=conf.args.opt['batch_size'],
-                                                                valid_split=0.01,
-                                                                test_split=0.98)
+                                                                valid_split=0.1,
+                                                                test_split=0.1)
         else:
             dataloader = data_loader.single_domain_data_loader(conf.args.opt['file_path'],
                                                                batch_size=conf.args.opt['batch_size'],
@@ -79,8 +82,12 @@ def main():
                                                                test_split=0.1)
         learner = DNN(model, dataloader=dataloader, tensorboard=tensorboard, write_path=log_path)
 
+    elif conf.args.method in ['Demo']:
+        dataloader = data_loader.data_loader_for_demo(conf.args.opt['file_path'])
+        learner = DNN(model, dataloader=dataloader, tensorboard=tensorboard, write_path=log_path)
+
     ################## Training ##################
-    if not conf.args.test_only and not conf.args.pca:
+    if not conf.args.test_only and not conf.args.pca and not conf.args.demo_produce: # and not conf.args.ensemble:
         since = time.time()
 
         start_epoch = 1
@@ -135,8 +142,16 @@ def main():
         resume = conf.args.load_checkpoint_path + 'cp_best.pth.tar'
         checkpoint = learner.load_checkpoint(resume)
         if checkpoint is not None:
-            epoch_acc, epoch_loss, cm_class = learner.pca_analysis()
-            print(cm_class)
+            learner.pca_analysis()
+    elif conf.args.demo_produce:
+        resume = conf.args.load_checkpoint_path + 'cp_best.pth.tar'
+        checkpoint = learner.load_checkpoint(resume)
+        learner.demo_produce()
+
+    # elif conf.args.ensemble: # ensemble model test
+    #     root = '/mnt/sting/yewon/EE595_BeatSaver/log/beat_original/Src/'
+    #     ensembles = ['lstm_layer1_hidden100_lr0.001',
+    #                  'meta_4classes_lr0.1_feat']
     else : # only for test
         resume = conf.args.load_checkpoint_path + 'cp_best.pth.tar'
         checkpoint = learner.load_checkpoint(resume)
@@ -160,7 +175,7 @@ def parse_arguments(argv):
     parser.add_argument('--model', type=str, default='beat_model',
                         help='Model to be used, in [beat_change_model, beat_change_model_light, beat_type_model].')
     parser.add_argument('--method', type=str, default='',
-                        help='Src')
+                        help='Src, Demo .., if Demo, add --demo_produce option together. do not add --downsample option')
     parser.add_argument('--test_only', action='store_true',
                         help='For test only, without training.')
     parser.add_argument('--gpu_idx', type=int, default=0,
@@ -187,6 +202,10 @@ def parse_arguments(argv):
                         help='Whether to downsample or not')
     parser.add_argument('--pca', action='store_true',
                         help='PCA Analysis Mode')
+    parser.add_argument('--demo_produce', action='store_true',
+                        help='for producing demo')
+    # parser.add_argument('--ensemble', action='store_true',
+    #                     help='Whether to use ensemble models when evaluating.')
 
     return parser.parse_args()
 

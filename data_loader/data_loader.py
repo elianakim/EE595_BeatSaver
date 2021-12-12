@@ -67,6 +67,19 @@ def single_domain_data_loader(file_path, batch_size, train_max_rows=np.inf, vali
     }
     return data_loader
 
+def data_loader_for_demo(file_path, batch_size = 1):
+    if conf.args.dataset in ['beat_original']:
+        if conf.args.type in ['beat_change']:
+            train_data = BeatChange_Dataset(file=file_path)
+        elif conf.args.type in ['beat_type']:
+            train_data = BeatType_Dataset(file=file_path)
+
+    data_loader = DataLoader(train_data, batch_size=batch_size, shuffle=False,
+                             num_workers=8, drop_last=True, pin_memory=False)
+    return data_loader
+
+
+
 
 if __name__ == '__main__':
     pass
