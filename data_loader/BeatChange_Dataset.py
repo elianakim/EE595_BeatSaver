@@ -16,7 +16,8 @@ opt = conf.BeatChange_Opt
 WIN_LEN = opt['seq_len']
 RAW = opt['raw']    # raw data OR feature
 SCALE = opt['scale']
-OVERLAPPING = opt['overlap_ratio'] # overlapping window
+OVERLAPPING = opt['overlapratio'] # overlapping window
+
 
 class BeatChange_Dataset(torch.utils.data.Dataset):
 
@@ -69,7 +70,21 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
             else:
                 # process feature
                 raw = self.df.iloc[pt:pt + WIN_LEN, 0:6].values
+                raw_label = self.df.iloc[pt:pt + WIN_LEN, 6:7].values
+
                 feature = np.zeros((WIN_LEN, 12)) #[None] * WIN_LEN
+                feature_label = np.zeros((WIN_LEN, 1))
+
+                flag = False
+                cls = None
+                for i in range(WIN_LEN):
+                    if raw_label[i][0] != 'None':
+                        flag= True
+                        cls = self.class_to_number(raw_label[i][0])
+                if flag:
+                    feature_label = np.full((WIN_LEN, 1), cls)
+                else:
+                    feature_label = np.zeros((WIN_LEN, 1))
 
                 # Split raw data into acc and gyro
                 raw_acc = raw[0:WIN_LEN, 0:3]
@@ -91,6 +106,12 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                     arr = np.append(arr,np.append(np.array(raw_gyro[i]), np.array([gyro_mean, gyro_std, gyro_var])))
 
                     feature[i,0:12] = arr
+                    '''
+                    if raw_label[i][0] == 'None':
+                        feature_label[i] = np.array(self.class_to_number('Not Change'))
+                    else:
+                        feature_label[i] = np.array(self.class_to_number(raw_label[i][0]))
+                    '''
 
                 if SCALE:
                     scaler = StandardScaler()
@@ -98,12 +119,14 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                     feature = feature_scaled
 
             feature = feature.T
+            feature_label = feature_label.T
 
             if conf.args.downsample:
                 self.data_per_class[label].append(feature)
             else:
                 self.features.append(feature)
-                self.class_labels.append(self.class_to_number(label))
+                #self.class_labels.append(self.class_to_number(label))
+                self.class_labels.append(feature_label)
 
             pt += int(WIN_LEN * OVERLAPPING)
 
@@ -133,7 +156,7 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
         self.dataset = torch.utils.data.TensorDataset(torch.from_numpy(self.features).float(),
                                                        torch.from_numpy(self.class_labels))
 
-        # Export numpy to csv
+        # Export csv
         '''
         for i in range(self.features.shape[0]):
             if i is 0:
@@ -143,15 +166,20 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
         #df_feature = pd.DataFrame(self.features.T)
         df_feature.columns = ['acc_x', 'acc_y','acc_z','acc_mean','acc_std','acc_var',
                               'gyro_x', 'gyro_y', 'gyro_z', 'gyro_mean', 'gyro_std', 'gyro_var']
-        df_label = pd.DataFrame(self.class_labels)
+        df_label = pd.DataFrame(np.squeeze(self.class_labels).flatten())
         df_label.columns = ['label']
         
-        df_feature["label"] = df_label
-        df = df_feature
+
+        # df = pd.concat([df_feature, df_label], axis = 1, ignore_index=True)
+        #df_feature["label"] = df_label
+        df = df_feature.reset_index(drop=True)
+        df['label'] = df_label
+        #df = df_feature
         
         # make csv file
-        df.to_csv('../dataset/20211211_f3_re_yewon/feature_labeled.csv', index=False)
+        df.to_csv('../dataset/20211211_meta/feature_labeled.csv', index=False)
         '''
+
 
 
     def __len__(self):
@@ -172,4 +200,5 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
         return dic[label]
 
 if __name__ == '__main__':
+
     dataset = BeatChange_Dataset()
