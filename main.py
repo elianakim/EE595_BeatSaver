@@ -169,6 +169,8 @@ def parse_arguments(argv):
                         help='Suffix of log file path')
     parser.add_argument('--remove_cp', action='store_true',
                         help='Remove checkpoints after evaluation')
+    parser.add_argument('--downsample', action='store_true',
+                        help='Whether to downsample or not')
 
     return parser.parse_args()
 

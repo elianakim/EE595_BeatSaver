@@ -99,30 +99,33 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
 
             feature = feature.T
 
-            # self.features.append(feature)
-            self.data_per_class[label].append(feature)
-            # self.class_labels.append(self.class_to_number(label))
+            if conf.args.downsample:
+                self.data_per_class[label].append(feature)
+            else:
+                self.features.append(feature)
+                self.class_labels.append(self.class_to_number(label))
 
             pt += int(WIN_LEN * OVERLAPPING)
 
         print(cbin) # print data statistics
 
-        # get the minimum number (nonzero) of data, down-sample the dataset
-        minnumdata = np.inf
-        for c in list(cbin.keys()):
-            if minnumdata > cbin[c] > 0:
-               minnumdata = cbin[c]
-        for c in list(self.data_per_class.keys()):
-            # randomly sample data
-            if cbin[c] > minnumdata:
-                sampled = random.sample(self.data_per_class[c], minnumdata)
-                self.features.extend(sampled)
-                for i in range(len(sampled)):
-                    self.class_labels.append(self.class_to_number(c))
-            else:
-                self.features.extend(self.data_per_class[c])
-                for i in range(len(self.data_per_class[c])):
-                    self.class_labels.append(self.class_to_number(c))
+        if conf.args.downsample:
+            # get the minimum number (nonzero) of data, down-sample the dataset
+            minnumdata = np.inf
+            for c in list(cbin.keys()):
+                if minnumdata > cbin[c] > 0:
+                   minnumdata = cbin[c]
+            for c in list(self.data_per_class.keys()):
+                # randomly sample data
+                if cbin[c] > minnumdata:
+                    sampled = random.sample(self.data_per_class[c], minnumdata)
+                    self.features.extend(sampled)
+                    for i in range(len(sampled)):
+                        self.class_labels.append(self.class_to_number(c))
+                else:
+                    self.features.extend(self.data_per_class[c])
+                    for i in range(len(self.data_per_class[c])):
+                        self.class_labels.append(self.class_to_number(c))
 
         self.features = np.array(self.features, dtype=np.float)
         self.class_labels = np.array(self.class_labels)
