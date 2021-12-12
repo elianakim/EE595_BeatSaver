@@ -10,8 +10,8 @@ sys.path.append('..')
 import conf
 
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
+from sklearn import StandardScaler
+import pyplot.matplotlib as plt
 
 opt = conf.BeatType_Opt
 WIN_LEN = opt['seq_len']
@@ -19,7 +19,7 @@ OVERLAPPING = opt['overlap_ratio'] # overlapping window
 
 class PCA_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='./20211211_meta/feature_labeled.csv'):
+    def __init__(self, file='./20211210_meta/feature_labeled.csv'):
         print('Loading data...')
 
         st = time.time()
@@ -28,12 +28,12 @@ class PCA_Dataset(torch.utils.data.Dataset):
         self.x = None
         self.y = None
 
+        #self.dataset = None
+        #self.classes = conf.BeatChange_Opt['classes']
 
-        # Load dataset into Pandas DataFrame
+        # load dataset into Pandas DataFrame
         self.df = pd.read_csv(file)
-        # Process dataset to plot PCA
         self.preprocessing()
-        # Plot PCA
         self.plot_pca()
         ppt = time.time()
         print('Loading data done with rows:{:d}\tPreprocessing:{:f}\tTotal Time:{:f}'.format(len(self.df.index),
@@ -43,12 +43,9 @@ class PCA_Dataset(torch.utils.data.Dataset):
     def preprocessing(self):
 
         df = self.df
-        '''
         self.features = ['acc_x', 'acc_y', 'acc_z', 'acc_mean', 'acc_std', 'acc_var',
                          'gyro_x', 'gyro_y', 'gyro_z', 'gyro_mean', 'gyro_std', 'gyro_var']
-        '''
-        self.features = ['acc_mean', 'acc_std', 'acc_var',
-                         'gyro_mean', 'gyro_std', 'gyro_']
+
         # Separate out the features
         x = df.loc[:, self.features].values
 
@@ -77,24 +74,23 @@ class PCA_Dataset(torch.utils.data.Dataset):
         fig = plt.figure(figsize = (8, 8))
         ax = fig.add_subplot(1, 1, 1)
         ax.set_xlabel('Principal Component 1', fontsize = 15)
-        ax.set_ylabel('Principal Component 2', fontsize = 15)
-        ax.set_title('2 component PCA', fontsize = 20)
-
-        labels = [0, 1, 2, 3]
-        colors = ['r', 'b', 'g', 'y']
-        for label, color in zip(labels, colors):
-            indices_to_keep = final_df['label'] == label
-            ax.scatter(final_df.loc[indices_to_keep, 'PC1'],
-                       final_df.loc[indices_to_keep, 'PC2'],
-                       c = color,
-                       s = 50,
-                       alpha = 0.2)
-        #ax.legend(labels)
-        ax.legend(['None', '3/4 beat 1', '3/4 beat 2', '3/4 beat3'])
-        ax.grid()
-        plt.show()
+        ax.
 
 
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        if isinstance(idx, torch.Tensor):
+            idx = idx.item()
+        return self.dataset[idx]
+
+    def class_to_number(self, label):
+        dic = {'Not Change': 0,
+               'Change': 1,
+               }
+        return dic[label]
 
 if __name__ == '__main__':
     dataset = PCA_Dataset()
