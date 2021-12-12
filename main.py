@@ -55,6 +55,8 @@ def main():
         import models.beat_model as model
     elif conf.args.model == 'beat_change_model_light':
         import models.beat_model_light as model
+    elif conf.args.model == 'beat_change_model_lstm':
+        import models.beat_model_lstm as model
     elif conf.args.model == 'beat_type_model':
         import models.beat_model as model
 
@@ -65,14 +67,20 @@ def main():
     tensorboard = Tensorboard(log_path)
 
     if conf.args.method in ['Src']:
-        dataloader = data_loader.single_domain_data_loader(conf.args.opt['file_path'],
-                                                            batch_size=conf.args.opt['batch_size'],
-                                                            valid_split=0.1,
-                                                            test_split=0.1)
+        if conf.args.pca:
+            dataloader = data_loader.single_domain_data_loader(conf.args.opt['file_path'],
+                                                                batch_size=conf.args.opt['batch_size'],
+                                                                valid_split=0.01,
+                                                                test_split=0.98)
+        else:
+            dataloader = data_loader.single_domain_data_loader(conf.args.opt['file_path'],
+                                                               batch_size=conf.args.opt['batch_size'],
+                                                               valid_split=0.1,
+                                                               test_split=0.1)
         learner = DNN(model, dataloader=dataloader, tensorboard=tensorboard, write_path=log_path)
 
     ################## Training ##################
-    if not conf.args.test_only:
+    if not conf.args.test_only and not conf.args.pca:
         since = time.time()
 
         start_epoch = 1
@@ -123,7 +131,13 @@ def main():
         print('Training complete time: {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
         print('Best val Acc: {:4f} at Epoch: {:d}'.format(best_acc, best_epoch))
 
-    else: # only for test
+    elif conf.args.pca: # pca analysis
+        resume = conf.args.load_checkpoint_path + 'cp_best.pth.tar'
+        checkpoint = learner.load_checkpoint(resume)
+        if checkpoint is not None:
+            epoch_acc, epoch_loss, cm_class = learner.pca_analysis()
+            print(cm_class)
+    else : # only for test
         resume = conf.args.load_checkpoint_path + 'cp_best.pth.tar'
         checkpoint = learner.load_checkpoint(resume)
         if checkpoint is not None:
@@ -171,6 +185,8 @@ def parse_arguments(argv):
                         help='Remove checkpoints after evaluation')
     parser.add_argument('--downsample', action='store_true',
                         help='Whether to downsample or not')
+    parser.add_argument('--pca', action='store_true',
+                        help='PCA Analysis Mode')
 
     return parser.parse_args()
 

@@ -170,6 +170,12 @@ class DNN():
                 input_of_labeled_data, class_label_of_labeled_data = self.get_label_and_data(labeled_data)
 
                 # compute the feature
+                if conf.args.model == 'beat_change_model_lstm':
+                    # reshape data from (batchsize, #feature, #sequence) to (batchsize, #sequence, #feature)
+                    input_of_labeled_data = torch.reshape(input_of_labeled_data, (input_of_labeled_data.shape[0],
+                                                                                  input_of_labeled_data.shape[2],
+                                                                                  input_of_labeled_data.shape[1]))
+                    self.feature_extractor.hidden = self.feature_extractor.init_hidden(batch_size=input_of_labeled_data.size(0))
                 feature_of_labeled_data = self.get_feature(self.feature_extractor, input_of_labeled_data)
 
                 # compute the class loss of feature_of_labeled_data
@@ -231,6 +237,55 @@ class DNN():
         exec(f'self.{name}_file.write(write_string)')
         # self.tensorboard.log_scalar(condition + '/' + name, value, epoch)
 
+    def pca_analysis(self, epoch = 0, condition='test'):
+        self.feature_extractor.eval()
+        self.class_classifier.eval()
+
+        class_loss_sum = 0.0
+        class_cm_labeled_sum = 0
+        class_cm_test_data_sum = 0
+
+        num_iter = len(self.source_dataloader[condition])
+
+        with torch.no_grad():
+            for batch_idx, test_data in tqdm(enumerate(self.source_dataloader[condition]), total=num_iter):
+                # test_data[0] = test_data[0].view(-1, *(test_data[0].shape[2:]))
+                test_data[1] = test_data[1].view(-1)
+
+                input_of_test_data, class_label_of_test_data = self.get_label_and_data(test_data)
+                if conf.args.model == 'beat_change_model_lstm':
+                    # reshape data from (batchsize, #feature, #sequence) to (batchsize, #sequence, #feature)
+                    input_of_test_data = torch.reshape(input_of_test_data, (input_of_test_data.shape[0],
+                                                                            input_of_test_data.shape[2],
+                                                                            input_of_test_data.shape[1]))
+                    self.feature_extractor.hidden = self.feature_extractor.init_hidden(batch_size=input_of_test_data.size(0))
+                feature_of_test_data = self.get_feature(self.feature_extractor, input_of_test_data)
+                # TODO: PCA analysis
+
+                class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
+                    self.class_classifier,
+                    self.class_criterion,
+                    feature_of_test_data,
+                    class_label_of_test_data)
+                # try:
+                #     class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
+                #                                                                     self.class_classifier,
+                #                                                                     self.class_criterion,
+                #                                                                     feature_of_test_data,
+                #                                                                     class_label_of_test_data)
+                # except:
+                #     print(feature_of_test_data.shape)
+
+                class_loss_sum += float(class_loss_of_test_data * input_of_test_data.size(0))
+                class_cm_test_data_sum += class_cm_test_data
+
+        epoch_avg_loss = self.log_loss_results(condition, epoch=epoch, loss_avg=class_loss_sum / num_iter)
+        class_accuracy_of_test_data = self.log_accuracy_results(condition, suffix='test', epoch=epoch, cm_class=class_cm_test_data_sum)
+        self.logger('loss', epoch_avg_loss, epoch, condition)
+        self.logger('accuracy', class_accuracy_of_test_data, epoch, condition)
+
+        return class_accuracy_of_test_data, epoch_avg_loss, class_cm_test_data_sum
+
     def evaluation(self, epoch, condition):
 
         self.feature_extractor.eval()
@@ -248,15 +303,26 @@ class DNN():
                 test_data[1] = test_data[1].view(-1)
 
                 input_of_test_data, class_label_of_test_data = self.get_label_and_data(test_data)
+                if conf.args.model == 'beat_change_model_lstm':
+                    # reshape data from (batchsize, #feature, #sequence) to (batchsize, #sequence, #feature)
+                    input_of_test_data = torch.reshape(input_of_test_data, (input_of_test_data.shape[0],
+                                                                            input_of_test_data.shape[2],
+                                                                            input_of_test_data.shape[1]))
+                    self.feature_extractor.hidden = self.feature_extractor.init_hidden(batch_size=input_of_test_data.size(0))
                 feature_of_test_data = self.get_feature(self.feature_extractor, input_of_test_data)
-                try:
-                    class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
-                                                                                    self.class_classifier,
-                                                                                    self.class_criterion,
-                                                                                    feature_of_test_data,
-                                                                                    class_label_of_test_data)
-                except:
-                    print(feature_of_test_data.shape)
+                class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
+                    self.class_classifier,
+                    self.class_criterion,
+                    feature_of_test_data,
+                    class_label_of_test_data)
+                # try:
+                #     class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
+                #                                                                     self.class_classifier,
+                #                                                                     self.class_criterion,
+                #                                                                     feature_of_test_data,
+                #                                                                     class_label_of_test_data)
+                # except:
+                #     print(feature_of_test_data.shape)
 
                 class_loss_sum += float(class_loss_of_test_data * input_of_test_data.size(0))
                 class_cm_test_data_sum += class_cm_test_data

@@ -36,6 +36,20 @@ BeatType_Opt = {
     'num_classes': 3,
 }
 
+BeatChange_LSTM_Opt = {
+    'activation': 'dropout',
+    'batch_size': 32,
+    'hidden_dim': 100,
+    'linear_arch': 'light',
+    'loss': 'l1',
+    'lr': 0.001,
+    'num_lstm_layers': 1,
+    'tanh': False,
+    'classes': ['Not Change', '3Beats_1', '3Beats_2', '3Beats_3'],
+    'num_classes': 4,
+    'bidirectional': False,
+}
+
 IMU_Process = {
     'sync': 0, # Sync index
     'acc_sampling_rate': 399,
