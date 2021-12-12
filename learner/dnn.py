@@ -46,8 +46,8 @@ class DNN():
 
         # learning rate scheduler
         self.scheduler = optim.lr_scheduler.StepLR(self.optimizer,
-                                                   step_size=100,
-                                                   gamma=0.5)
+                                                   step_size=50,
+                                                   gamma=0.1)
 
     def save_checkpoint(self, epoch, epoch_acc, best_acc, checkpoint_path):
         state = {}
