@@ -38,9 +38,15 @@ def main():
     ################## Load default hyperparameter ##################
     if 'beat_change' in conf.args.type:
         if conf.args.demo_produce:
-            opt = conf.BeatChange_Demo_Opt
+            if conf.args.beat_type == 3:
+                opt = conf.Beat3Change_Demo_Opt
+            elif conf.args.beat_type == 4:
+                opt = conf.Beat4Change_Demo_Opt
         else:
-            opt = conf.BeatChange_Opt
+            if conf.args.beat_type == 3:
+                opt = conf.Beat3Change_Opt
+            elif conf.args.beat_type == 4:
+                opt = conf.Beat4Change_Opt
     elif 'beat_type' in conf.args.type:
         opt = conf.BeatType_Opt
 
@@ -204,6 +210,8 @@ def parse_arguments(argv):
                         help='PCA Analysis Mode')
     parser.add_argument('--demo_produce', action='store_true',
                         help='for producing demo')
+    parser.add_argument('--beat_type', type=int, default=3,
+                        help='when training beat_change model, input the beat_type among 2, 3, 4. default = 3')
     # parser.add_argument('--ensemble', action='store_true',
     #                     help='Whether to use ensemble models when evaluating.')
 

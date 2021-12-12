@@ -1,7 +1,7 @@
 args = None
 
-BeatChange_Opt = {
-    'name': 'beat_change',
+Beat2Change_Opt = {
+    'name': 'beat2_change',
     'label_index': 6,
     'batch_size': 32,
     'sampling_rate': 399,
@@ -16,24 +16,76 @@ BeatChange_Opt = {
     'num_classes': 4,
     'raw': True,
     'scale': False,
-    # 'classes': ['Not Change', 'Change'],
-    # 'num_classes': 2,
 }
 
-BeatChange_Demo_Opt = {
-    'name': 'beat_change',
+Beat3Change_Opt = {
+    'name': 'beat3_change',
     'label_index': 6,
     'batch_size': 32,
     'sampling_rate': 399,
     'seq_len': 133,
-    'overlap_ratio': 1.0,
-    'file_path': './dataset/20211211_meta/accgyro.csv',
+    'overlap_ratio': 0.5,
+    'file_path': './dataset/20211212_f3_meta_re/accgyro.csv',
     'input_dim': 6,
     'learning_rate': 0.1,
     'weight_decay': 0.00001,
     'momentum': 0.9,
     'classes': ['Not Change', '3Beats_1', '3Beats_2', '3Beats_3'],
     'num_classes': 4,
+    'raw': True,
+    'scale': False,
+}
+
+Beat4Change_Opt = {
+    'name': 'beat4_change',
+    'label_index': 6,
+    'batch_size': 32,
+    'sampling_rate': 399,
+    'seq_len': 133,
+    'overlap_ratio': 0.5,
+    'file_path': './dataset/20211213_f4_meta/accgyro.csv',
+    'input_dim': 6,
+    'learning_rate': 0.1,
+    'weight_decay': 0.00001,
+    'momentum': 0.9,
+    'classes': ['Not Change', '4Beats_1', '4Beats_2', '4Beats_3', '4Beats_4'],
+    'num_classes': 5,
+    'raw': True,
+    'scale': False,
+}
+
+Beat3Change_Demo_Opt = {
+    'name': 'beat_change_demo',
+    'label_index': 6,
+    'batch_size': 32,
+    'sampling_rate': 399,
+    'seq_len': 133,
+    'overlap_ratio': 1.0,
+    'file_path': './dataset/20211212_f3_meta_re/accgyro.csv',
+    'input_dim': 6,
+    'learning_rate': 0.1,
+    'weight_decay': 0.00001,
+    'momentum': 0.9,
+    'classes': ['Not Change', '3Beats_1', '3Beats_2', '3Beats_3'],
+    'num_classes': 4,
+    'raw': True,
+    'scale': False,
+}
+
+Beat4Change_Demo_Opt = {
+    'name': 'beat4_change_demo',
+    'label_index': 6,
+    'batch_size': 32,
+    'sampling_rate': 399,
+    'seq_len': 133,
+    'overlap_ratio': 1.0,
+    'file_path': './dataset/20211213_f4_meta/accgyro.csv',
+    'input_dim': 6,
+    'learning_rate': 0.1,
+    'weight_decay': 0.00001,
+    'momentum': 0.9,
+    'classes': ['Not Change', '4Beats_1', '4Beats_2', '4Beats_3', '4Beats_4'],
+    'num_classes': 5,
     'raw': True,
     'scale': False,
 }

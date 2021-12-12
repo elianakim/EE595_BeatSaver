@@ -21,7 +21,7 @@ OVERLAPPING = opt['overlap_ratio'] # overlapping window
 
 class BeatChange_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='../dataset/20211212_f3_meta_re/accgyro.csv'):
+    def __init__(self, file=opt['file_path']):
         print('Loading data...')
 
         st = time.time()
@@ -30,7 +30,7 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
         self.data_per_class = None
         self.class_labels = None
         self.dataset = None
-        self.classes = conf.BeatChange_Opt['classes']
+        self.classes = opt['classes']
 
         self.df = pd.read_csv(file)
         self.preprocessing()
@@ -41,10 +41,15 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
 
     def preprocessing(self):
         self.features = []
-        self.data_per_class = {'Not Change': [], '3beats_1': [], '3beats_2': [], '3beats_3': [], 'Change': []}
+        if conf.args.beat_type == 3:
+            self.data_per_class = {'Not Change': [], '3beats_1': [], '3beats_2': [], '3beats_3': [], 'Change': []}
+            cbin = {'Not Change': 0, '3beats_1': 0, '3beats_2': 0, '3beats_3': 0, 'Change': 0}
+        elif conf.args.beat_type == 4:
+            self.data_per_class = {'Not Change': [], '4beats_1': [], '4beats_2': [], '4beats_3': [], '4beats_4': [], 'Change': []}
+            cbin = {'Not Change': 0, '4beats_1': 0, '4beats_2': 0, '4beats_3': 0, '4beats_4': 0, 'Change': 0}
         self.class_labels = []
+
         pt = 0
-        cbin = {'Not Change': 0, '3beats_1': 0, '3beats_2': 0, '3beats_3': 0, 'Change': 0}
         while pt + WIN_LEN <= len(self.df):
             bt = time.time()
             # decide label
@@ -190,12 +195,20 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
         return self.dataset[idx]
 
     def class_to_number(self, label):
-        dic = {'Not Change': 0,
-               '3beats_1': 1,
-               '3beats_2': 2,
-               '3beats_3':3
-               # 'Change': 1,
-               }
+        if conf.args.beat_type == 3:
+            dic = {'Not Change': 0,
+                   '3beats_1': 1,
+                   '3beats_2': 2,
+                   '3beats_3':3
+                   # 'Change': 1,
+                   }
+        elif conf.args.beat_type == 4:
+            dic = {'Not Change': 0,
+                   '4beats_1': 1,
+                   '4beats_2': 2,
+                   '4beats_3': 3,
+                   '4beats_4': 4,
+                    }
         return dic[label]
 
 if __name__ == '__main__':
