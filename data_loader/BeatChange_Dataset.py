@@ -12,16 +12,16 @@ from sklearn.preprocessing import StandardScaler
 sys.path.append('..')
 import conf
 
-opt = conf.BeatChange_Opt
+opt = conf.args.opt
 WIN_LEN = opt['seq_len']
 RAW = opt['raw']    # raw data OR feature
 SCALE = opt['scale']
-OVERLAPPING = opt['overlapratio'] # overlapping window
+OVERLAPPING = opt['overlap_ratio'] # overlapping window
 
 
 class BeatChange_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='../dataset/20211211_meta/accgyro.csv'):
+    def __init__(self, file='../dataset/20211212_f3_meta_re/accgyro.csv'):
         print('Loading data...')
 
         st = time.time()
@@ -125,8 +125,7 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                 self.data_per_class[label].append(feature)
             else:
                 self.features.append(feature)
-                #self.class_labels.append(self.class_to_number(label))
-                self.class_labels.append(feature_label)
+                self.class_labels.append(self.class_to_number(label))
 
             pt += int(WIN_LEN * OVERLAPPING)
 

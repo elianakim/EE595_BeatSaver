@@ -7,7 +7,7 @@ BeatChange_Opt = {
     'sampling_rate': 399,
     'seq_len': 133,
     'overlap_ratio': 0.5,
-    'file_path': './dataset/20211211_meta/accgyro.csv',
+    'file_path': './dataset/20211212_f3_meta_re/accgyro.csv',
     'input_dim': 6,
     'learning_rate': 0.1,
     'weight_decay': 0.00001,
@@ -18,6 +18,24 @@ BeatChange_Opt = {
     'scale': False,
     # 'classes': ['Not Change', 'Change'],
     # 'num_classes': 2,
+}
+
+BeatChange_Demo_Opt = {
+    'name': 'beat_change',
+    'label_index': 6,
+    'batch_size': 32,
+    'sampling_rate': 399,
+    'seq_len': 133,
+    'overlap_ratio': 1.0,
+    'file_path': './dataset/20211211_meta/accgyro.csv',
+    'input_dim': 6,
+    'learning_rate': 0.1,
+    'weight_decay': 0.00001,
+    'momentum': 0.9,
+    'classes': ['Not Change', '3Beats_1', '3Beats_2', '3Beats_3'],
+    'num_classes': 4,
+    'raw': True,
+    'scale': False,
 }
 
 BeatType_Opt = {
