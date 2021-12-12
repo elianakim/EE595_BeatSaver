@@ -10,8 +10,11 @@ import conf
 # import random
 # from sklearn.manifold import TSNE
 # import seaborn as sns
-# import pandas as pd
-# import matplotlib.pyplot as plt
+
+import pandas as pd
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
 
 device = torch.device("cuda:{:d}".format(conf.args.gpu_idx) if torch.cuda.is_available() else "cpu")
 torch.cuda.set_device(conf.args.gpu_idx) # this prevents unnecessary gpu memory allocation to cuda:0 when using estimator
@@ -249,10 +252,17 @@ class DNN():
 
         with torch.no_grad():
             for batch_idx, test_data in tqdm(enumerate(self.source_dataloader[condition]), total=num_iter):
+                print("-----------")
+                print(test_data[0].shape)
+                print(test_data[1].shape)
                 # test_data[0] = test_data[0].view(-1, *(test_data[0].shape[2:]))
                 test_data[1] = test_data[1].view(-1)
+                print(test_data[0].shape)
+                print(test_data[1].shape)
 
                 input_of_test_data, class_label_of_test_data = self.get_label_and_data(test_data)
+                print(input_of_test_data.shape)
+                print(class_label_of_test_data.shape)
                 if conf.args.model == 'beat_change_model_lstm':
                     # reshape data from (batchsize, #feature, #sequence) to (batchsize, #sequence, #feature)
                     input_of_test_data = torch.reshape(input_of_test_data, (input_of_test_data.shape[0],
@@ -261,6 +271,44 @@ class DNN():
                     self.feature_extractor.hidden = self.feature_extractor.init_hidden(batch_size=input_of_test_data.size(0))
                 feature_of_test_data = self.get_feature(self.feature_extractor, input_of_test_data)
                 # TODO: PCA analysis
+                print("======================================================================")
+                print(feature_of_test_data.shape)
+                print(class_label_of_test_data.shape)
+                x = pd.DataFrame(feature_of_test_data.numpy())
+                y = pd.DataFrame(class_label_of_test_data.numpy())
+
+                scaler = StandardScaler()
+                x = scaler.fit_transform(x)
+
+                pca = PCA(n_components=2)
+                PCs = pca.fit_transform(x)
+
+                principal_df = pd.DataFrame(data = PCs,
+                                            columns = ['PC1', 'PC2'])
+
+                final_df = pd.concat([principal_df, y], axis=1)
+                final_df.columns = ['PC1','PC2','label']
+
+                fig = plt.figure(figsize=(8,8))
+                ax = fig.add_subplot(1,1,1)
+                ax.set_xlabel('Principal Component 1', fontsize=15)
+                ax.set_ylabel('Principal Component 2', fontsize=15)
+                ax.set_title('2 component PCA', fontsize=20)
+
+                labels = [0, 1, 2, 3]
+                colors = ['r', 'b', 'g', 'c']
+                for label, color in zip(labels, colors):
+                    indices_to_keep = final_df['label'] == label
+                    ax.scatter(final_df.loc[indices_to_keep, 'PC1'],
+                               final_df.loc[indices_to_keep, 'PC2'],
+                               c=color,
+                               s=50,
+                               alpha=0.2)
+                # ax.legend(labels)
+                ax.legend(['None', '3/4 beat 1', '3/4 beat 2', '3/4 beat3'])
+                ax.grid()
+                plt.show()
+                plt.savefig('PCA.png', dpi=300)
 
                 class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
                     self.class_classifier,
