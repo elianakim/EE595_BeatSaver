@@ -265,7 +265,7 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
         df_tick.columns = ['beats', 'dynamic']
 
         print(df_tick)
-        df_tick.to_csv('../dataset/20211212_fe_meta_re/beats_211212_meta_re_lr0.1_feat_re_dynamic.csv')
+        df_tick.to_csv('../dataset/20211212_f3_meta_re/beats_211212_meta_re_lr0.1_feat_re_dynamic.csv')
 
 
 
