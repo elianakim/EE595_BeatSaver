@@ -2,6 +2,6 @@ imu_filepath,sensor_idx
 /mnt/sting/yewon/EE595_BeatSaver/rawdata/data/f3_yewon.csv,288
 /mnt/sting/yewon/EE595_BeatSaver/rawdata/data/f3_haerang.csv,89
 /mnt/sting/yewon/EE595_BeatSaver/rawdata/data/f3_re_yewon.csv,1226
-/mnt/sting/yewon/EE595_BeatSaver/rawdata/data/f3_meta.csv,8715
-/mnt/sting/yewon/EE595_BeatSaver/rawdata/data/f4_meta.csv,9258
-/mnt/sting/yewon/EE595_BeatSaver/rawdata/data/p3_meta.csv,5162
+/mnt/sting/yewon/EE595_BeatSaver/rawdata/data/f3_400hz.csv,8715
+/mnt/sting/yewon/EE595_BeatSaver/rawdata/data/f4_400hz.csv,9258
+/mnt/sting/yewon/EE595_BeatSaver/rawdata/data/p3_400hz.csv,5162

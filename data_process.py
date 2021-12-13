@@ -146,6 +146,10 @@ def add_labels(df, l_df):
     beat_labels = [conf.args.beats for i in range(df.shape[0])]
     df['beat'] = beat_labels
 
+    # add dynamics of label (for domain separation)
+    dynamic_labels = [conf.args.dynamics for i in range(df.shape[0])]
+    df['dynamic'] = dynamic_labels
+
     return df
 
 def main():

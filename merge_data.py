@@ -17,7 +17,7 @@ def merge_data(args):
     Merge all the processed data whose folder contains conf.args.regex and saves the combined file into dataset directory.
     '''
     raw_data_path = os.getcwd() + "/processed"
-    dirs = []
+    directories = []
     pattern_of_path = args.regex
     pattern_of_path = re.compile(pattern_of_path)
 
@@ -25,16 +25,16 @@ def merge_data(args):
     for (root, dirs, files) in os.walk(raw_data_path):
         for file in files:
             if not pattern_of_path.match(file): continue
-            fdir= root + "/" + file
-            dirs.append(fdir)
+            fdir = root + "/" + file
+            directories.append(fdir)
 
     # read and combine data.
     # save the combined data into the "dataset" directory with filename specified in args.dataset_name
-    if len(dirs) == 0:
+    if len(directories) == 0:
         print("no matching file for " + args.regex)
         return
 
-    combined_csv_data = pd.concat([pd.read_csv(f) for f in dirs]).iloc[:, 1:] # iloc to ignore unnecessary index
+    combined_csv_data = pd.concat([pd.read_csv(f) for f in directories]).iloc[:, 1:] # iloc to ignore unnecessary index
     combined_csv_data = combined_csv_data.reset_index(drop=True)
     print(combined_csv_data)
 
