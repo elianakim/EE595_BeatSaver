@@ -21,11 +21,12 @@ else:
     LABEL_INDEX = 13    # when using both raw data and feature
 
 UNIT = 002506.265664
-WIN_LEN = 3000
+#WIN_LEN = 3000
+THRESHOLD = 4.5
 
 class Trajectory_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='../dataset/20211213_f4_meta/accgyro.csv'):
+    def __init__(self, file='../dataset/20211212_f3_meta_re/accgyro.csv'):
         print('Loading data...')
 
         st = time.time()
@@ -36,12 +37,14 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
         #self.dataset = None
         #self.classes = conf.BeatChange_Opt['classes']
         self.beat_timestamp = None
+        self.dynamics = None
 
         self.df = pd.read_csv(file)
         self.generated_df = None
-        self.extract_beats()
-        self.preprocessing()
-        #self.trajectory_plot()
+        #self.extract_beats()
+        print('Extracting beats done\t Total Time:{:f}',time.time()-st)
+        #self.preprocessing()
+        self.synchronize()
         ppt = time.time()
         print('Loading data done with rows:{:d}\tPreprocessing:{:f}\tTotal Time:{:f}'.format(len(self.df.index),
                                                                                              time.time() - ppt,
@@ -215,100 +218,57 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
                 row['dist'] = dist
                 #row['microTime'] = microTime
                 #row['microTime'] = j    #index
-                generated_df = generated_df.append(row)
-            idx = timestamp
-        generated_df.to_csv('../dataset/20211213_f4_meta/beat_timestamp_trajectory_dist.csv')
-
-    def trajectory_plot(self):
-        self.features = []
-        df = self.df
-        df.columns = ['acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'beat_change', 'beat']
-        generated_df = pd.DataFrame()
-        # microTime_old = time.time() *1000000
-        idx = 0
-        while idx < len(df):
-            for i in range(WIN_LEN):
-                if i == 0:
-                    rotate_x = 0
-                    rotate_y = 0
-                    rotate_z = 0
-                    vx = 0
-                    vy = 0
-                    vz = 0
-                    x = 0
-                    y = 0
-                    z = 0
-                    continue
-                previous_timestamp = i-1
-                ax_offset = df['acc_x'][previous_timestamp]
-                ay_offset = df['acc_y'][previous_timestamp]
-                az_offset = df['acc_z'][previous_timestamp]
-                microTime_delta = UNIT
-                ''' Read gyroscope and compute the angle '''
-                gx = -df['gyro_x'][i]  # X axis reverse
-                gy = df['gyro_y'][i]
-                gz = df['gyro_z'][i]
-                rotate_x = rotate_x + gx * microTime_delta / 1000000 * (2 * math.pi / 360);
-                rotate_y = rotate_y + gy * microTime_delta / 1000000 * (2 * math.pi / 360);
-                rotate_z = rotate_z + gz * microTime_delta / 1000000 * (2 * math.pi / 360);
-                ''' Read the acceleration (relative to the device's axis) '''
-                ax = -df['acc_x'][i]  # X axis reverse
-                ay = df['acc_y'][i]
-                az = df['acc_z'][i]
-                ''' Remove roll '''
-                ax_tmp = ax
-                ay_tmp = ay * math.cos(rotate_x) - az * math.sin(rotate_x)
-                az_tmp = az * math.sin(rotate_x) + ax * math.cos(rotate_x)
-                ax = ax_tmp
-                ay = ay_tmp
-                az = az_tmp
-                ''' Remove pitch '''
-                ax_tmp = ax * math.cos(rotate_y) + az * math.sin(rotate_y)
-                ay_tmp = ay
-                az_tmp = - ax * math.sin(rotate_y) + az * math.cos(rotate_y)
-                ax = ax_tmp
-                ay = ay_tmp
-                az = az_tmp
-                ''' Remove yaw '''
-                ax_tmp = ax * math.cos(rotate_z) - ay * math.sin(rotate_z)
-                ay_tmp = ax * math.sin(rotate_z) + ay * math.sin(rotate_z)
-                az_tmp = az
-                ax = ax_tmp
-                ay = ay_tmp
-                az = az_tmp
-                ''' Remove acceleration offset '''
-                ax = ax - ax_offset
-                ay = ay - ay_offset
-                az = az - az_offset
-                ''' Now we have acc with respect to the absolute(world) axis
-                    # Double integral to compute location '''
-                vx = vx + 9.8 * ax * microTime_delta / 1000000
-                vy = vy + 9.8 * ay * microTime_delta / 1000000
-                vz = vz + 9.8 * az * microTime_delta / 1000000
-                x = x + vx * microTime_delta / 1000000
-                y = y + vy * microTime_delta / 1000000
-                z = z + vz * microTime_delta / 1000000
-                '''
-                if len(generated_df) == 0:
-                    x_sqr = x*x*10000
-                    y_sqr = y*y*10000
-                    z_sqr = z*z*10000
+                if j == (timestamp-1):
+                    if dist < THRESHOLD:
+                        row['dynamic'] = 'f'
+                    else:
+                        row['dynamic'] = 'p'
                 else:
-                    x_sqr = math.pow((x - generated_df['x'][j-1]),2)*10000   # x*x*10000
-                    y_sqr = math.pow((y - generated_df['y'][j-1]),2)*10000   #y*y*10000
-                    z_sqr = math.pow((z - generated_df['z'][j-1]),2)*10000   #z*z*10000
-                dist = math.sqrt(x_sqr+y_sqr+z_sqr)
-                '''
-                row = df.iloc[[i]]
-                row['x'] = x
-                row['y'] = y
-                row['z'] = z
-                # row['dist'] = dist
-                # row['microTime'] = microTime
-                #row['microTime'] = i  # index
+                    row['dynamic'] = 'n'
                 generated_df = generated_df.append(row)
-            idx = idx + WIN_LEN
-        generated_df.to_csv('../dataset/20211211_meta/trajectory_WIN_LEN_3000.csv')
+                print('\fth trajectory tracking done\n', j)
+            idx = timestamp
+        generated_df['dynamic'].to_csv('../dataset/20211212_f3_meta_re/dynamic.csv')
+        #generated_df.to_csv('../dataset/20211212_f3_meta_re/beat_timestamp_trajectory_dist_dynamic.csv')
+
+    def synchronize(self):
+        file_dynamic = ('../dataset/20211212_f3_meta_re/dynamic.csv')
+        file_tick = ('../dataset/20211212_f3_meta_re/beats_211212_meta_re_lr0.1_feat_re.csv')
+        df_dynamic = pd.read_csv(file_dynamic)
+        df_tick = pd.read_csv(file_tick)
+
+        arr_dynamic = []
+
+        j = 0
+        for i in range(len(df_tick)):
+            print('Search dynamic information of \fth tick\n', i)
+            if i == 0: # No dynamic at fist
+                arr_dynamic.append('n')
+                #df_tick['dynamic'][i] = 'n'
+                continue
+            if df_tick.values[i]== 0:  # Not beat change
+                arr_dynamic.append('n')
+                #df_tick['dynamic'][i] = 'n' # No information about dynamic
+            elif df_tick.values[i] > 0: # Beat change
+                while j < len(df_dynamic):  # Search dynamic information
+                    if df_dynamic['dynamic'][j] == 'n': # When no information about dynamic
+                        j+=1
+                        continue
+                    else:   # Information about dynamic 'f' or 'p'
+                        arr_dynamic.append(df_dynamic['dynamic'][j])
+                        #df_tick['dynamic'][i] = df_dynamic[1][j]    # Information about dynamic
+                        j+=1
+                        break   # Finish searching
+                    j += 1
+
+        df_tick['dynamic'] = arr_dynamic
+
+        print(df_tick)
+        df_tick.to_csv('../dataset/20211212_fe_meta_re/beats_211212_meta_re_lr0.1_feat_re_dynamic.csv')
+
+
+
+
 
     def __len__(self):
         return len(self.dataset)
