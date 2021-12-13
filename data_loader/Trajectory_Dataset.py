@@ -26,7 +26,7 @@ THRESHOLD = 4.5
 
 class Trajectory_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='../dataset/20211212_f3_meta_re/accgyro.csv'):
+    def __init__(self, file='../dataset/20211213_f4_400hz_re/accgyro.csv'):
         print('Loading data...')
 
         st = time.time()
@@ -41,10 +41,10 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
 
         self.df = pd.read_csv(file)
         self.generated_df = None
-        #self.extract_beats()
+        self.extract_beats()
         print('Extracting beats done\t Total Time:{:f}',time.time()-st)
-        #self.preprocessing()
-        self.synchronize()
+        self.preprocessing()
+        #self.synchronize()
         ppt = time.time()
         print('Loading data done with rows:{:d}\tPreprocessing:{:f}\tTotal Time:{:f}'.format(len(self.df.index),
                                                                                              time.time() - ppt,
@@ -88,6 +88,7 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
         beat_timestamp_df = pd.DataFrame(beat_timestamp)
         # beat_timestamp_df.to_csv('../dataset/20211211_f3_re_yewon/beat_timestamp.csv')
         self.beat_timestamp = beat_timestamp_df
+        beat_timestamp_df.to_csv('../dataset/20211213_f4_400hz_re/beat_timestamp.csv')
 
 
 
@@ -101,7 +102,11 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
         self.features = []
 
         df = self.df
-        df.columns = ['acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'beat_change', 'beat']
+        if len(df.columns) == 8:
+            df.columns = ['acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'beat_change', 'beat']
+        if len(df.columns) == 9:
+            df.columns = ['acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z', 'beat_change', 'beat', 'dynamic']
+
         generated_df = pd.DataFrame()
         # microTime_old = time.time() *1000000
 
@@ -228,8 +233,8 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
                 generated_df = generated_df.append(row)
                 print('\fth trajectory tracking done\n', j)
             idx = timestamp
-        generated_df['dynamic'].to_csv('../dataset/20211212_f3_meta_re/dynamic.csv')
-        #generated_df.to_csv('../dataset/20211212_f3_meta_re/beat_timestamp_trajectory_dist_dynamic.csv')
+        generated_df['dynamic'].to_csv('../dataset/20211213_f4_400hz_re/dynamic.csv')
+        generated_df.to_csv('../dataset/20211213_f4_400hz_re/beat_timestamp_trajectory_dist_dynamic.csv')
 
     def synchronize(self):
         file_dynamic = ('../dataset/20211212_f3_meta_re/dynamic.csv')
