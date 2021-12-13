@@ -41,10 +41,10 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
 
         self.df = pd.read_csv(file)
         self.generated_df = None
-        self.extract_beats()
+        #self.extract_beats()
         print('Extracting beats done\t Total Time:{:f}',time.time()-st)
-        self.preprocessing()
-        #self.synchronize()
+        #self.preprocessing()
+        self.synchronize()
         ppt = time.time()
         print('Loading data done with rows:{:d}\tPreprocessing:{:f}\tTotal Time:{:f}'.format(len(self.df.index),
                                                                                              time.time() - ppt,

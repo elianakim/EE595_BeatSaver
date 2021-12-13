@@ -26,7 +26,7 @@ THRESHOLD = 4.5
 
 class Trajectory_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='../dataset/20211213_p3_meta/accgyro.csv'):
+    def __init__(self, file='../dataset/20211213_f2_400hz/beat_timestamp_trajectory_dist_dynamic.csv'):
         print('Loading data...')
 
         st = time.time()
@@ -87,7 +87,7 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
 
         beat_timestamp_df = pd.DataFrame(beat_timestamp)
         self.beat_timestamp = beat_timestamp_df
-        beat_timestamp_df.to_csv('../dataset/20211213_p3_meta/beat_timestamp.csv')
+        beat_timestamp_df.to_csv('../dataset/20211213_f2_400hz/beat_timestamp.csv')
 
 
 
