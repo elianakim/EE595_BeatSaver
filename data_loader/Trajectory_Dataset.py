@@ -25,7 +25,7 @@ WIN_LEN = 3000
 
 class Trajectory_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='../dataset/20211212_f3_meta_re/accgyro.csv'):
+    def __init__(self, file='../dataset/20211213_f4_meta/accgyro.csv'):
         print('Loading data...')
 
         st = time.time()
@@ -64,7 +64,6 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
                 label = l
             else:
                 label = 0
-
             self.class_labels.append(self.class_to_number(label))
         '''
         self.class_labels = pd.DataFrame(labels)
@@ -106,19 +105,28 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
         idx = 0
         for i in range(len(self.beat_timestamp)):
             timestamp = self.beat_timestamp[0][i]
-            if idx is 0: # if idx is 0, it means that there is no previous beat
+            rotate_x = 0
+            rotate_y = 0
+            rotate_z = 0
+            vx = 0
+            vy = 0
+            vz = 0
+            x = 0
+            y = 0
+            z = 0
+            if i is 0: # if i is 0, it means that there is no previous beat
                 idx = timestamp
                 microTime_old = time.time()*1000000
                 # microTime_old = df['timestamp_ms'][timestamp]
-                rotate_x = 0
-                rotate_y = 0
-                rotate_z = 0
-                vx = 0
-                vy = 0
-                vz = 0
-                x = 0
-                y = 0
-                z = 0
+                #rotate_x = 0
+                #rotate_y = 0
+                #rotate_z = 0
+                #vx = 0
+                #vy = 0
+                #vz = 0
+                #x = 0
+                #y = 0
+                #z = 0
                 continue
             previous_timestamp = idx
             # Initialize acc_offset
@@ -187,8 +195,9 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
                 y = y + vy * microTime_delta / 1000000
                 z = z + vz * microTime_delta / 1000000
 
-                '''
-                if len(generated_df) == 0:
+
+                #if len(generated_df) == 0:
+                if j == previous_timestamp+1:
                     x_sqr = x*x*10000
                     y_sqr = y*y*10000
                     z_sqr = z*z*10000
@@ -197,18 +206,18 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
                     y_sqr = math.pow((y - generated_df['y'][j-1]),2)*10000   #y*y*10000
                     z_sqr = math.pow((z - generated_df['z'][j-1]),2)*10000   #z*z*10000
                 dist = math.sqrt(x_sqr+y_sqr+z_sqr)
-                '''
+
 
                 row = df.iloc[[j]]
                 row['x'] = x
                 row['y'] = y
                 row['z'] = z
-                #row['dist'] = dist
+                row['dist'] = dist
                 #row['microTime'] = microTime
-                row['microTime'] = j    #index
+                #row['microTime'] = j    #index
                 generated_df = generated_df.append(row)
             idx = timestamp
-        generated_df.to_csv('../dataset/20211212_f3_meta_re/beat_timestamp_trajectory.csv')
+        generated_df.to_csv('../dataset/20211213_f4_meta/beat_timestamp_trajectory_dist.csv')
 
     def trajectory_plot(self):
         self.features = []
