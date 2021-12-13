@@ -22,11 +22,11 @@ else:
 
 UNIT = 002506.265664
 #WIN_LEN = 3000
-THRESHOLD = 4.5
+THRESHOLD = 3.7
 
 class Trajectory_Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, file='../dataset/20211213_f4_400hz_re/accgyro.csv'):
+    def __init__(self, file='../dataset/20211213_demo_3/accgyro.csv'):
         print('Loading data...')
 
         st = time.time()
@@ -88,7 +88,7 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
         beat_timestamp_df = pd.DataFrame(beat_timestamp)
         # beat_timestamp_df.to_csv('../dataset/20211211_f3_re_yewon/beat_timestamp.csv')
         self.beat_timestamp = beat_timestamp_df
-        beat_timestamp_df.to_csv('../dataset/20211213_f4_400hz_re/beat_timestamp.csv')
+        #beat_timestamp_df.to_csv('../dataset/20211213_demo_3/beat_timestamp.csv')
 
 
 
@@ -233,12 +233,12 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
                 generated_df = generated_df.append(row)
                 print('\fth trajectory tracking done\n', j)
             idx = timestamp
-        generated_df['dynamic'].to_csv('../dataset/20211213_f4_400hz_re/dynamic.csv')
-        generated_df.to_csv('../dataset/20211213_f4_400hz_re/beat_timestamp_trajectory_dist_dynamic.csv')
+        generated_df['dynamic'].to_csv('../dataset/20211213_demo_3/dynamic_t3_3.csv')
+        generated_df.to_csv('../dataset/20211213_demo_3/beat_timestamp_trajectory_dist_dynamic_t3_3.csv')
 
     def synchronize(self):
-        file_dynamic = ('../dataset/20211212_f3_meta_re/dynamic.csv')
-        file_tick = ('../dataset/20211212_f3_meta_re/beats_211212_meta_re_lr0.1_feat_re.csv')
+        file_dynamic = ('../dataset/20211213_demo_3/dynamic_t3_3.csv')
+        file_tick = ('../results/demo_beats_change_3.csv')
         df_dynamic = pd.read_csv(file_dynamic)
         df_tick = pd.read_csv(file_tick)
 
@@ -254,7 +254,8 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
             if df_tick.values[i]== 0:  # Not beat change
                 arr_dynamic.append('n')
                 #df_tick['dynamic'][i] = 'n' # No information about dynamic
-            elif df_tick.values[i] > 0: # Beat change
+            #elif df_tick.values[i] > 0: # Beat change
+            else:
                 while j < len(df_dynamic):  # Search dynamic information
                     if df_dynamic['dynamic'][j] == 'n': # When no information about dynamic
                         j+=1
@@ -265,12 +266,17 @@ class Trajectory_Dataset(torch.utils.data.Dataset):
                         j+=1
                         break   # Finish searching
                     j += 1
+        if (len(df_tick) > len(arr_dynamic)):
+            index_for_copy = len(arr_dynamic) - 1
+            diff = len(df_tick) - len(arr_dynamic)
+            for i in range(diff):
+                arr_dynamic.append(arr_dynamic[index_for_copy])
 
         df_tick['dynamic'] = arr_dynamic
         df_tick.columns = ['beats', 'dynamic']
 
         print(df_tick)
-        df_tick.to_csv('../dataset/20211212_f3_meta_re/beats_211212_meta_re_lr0.1_feat_re_dynamic.csv')
+        df_tick.to_csv('../results/demo_beats_change_3_dynamic_t3_3.csv')
 
 
 
