@@ -11,7 +11,10 @@ device = torch.device("cuda:{:d}".format(conf.args.gpu_idx) if torch.cuda.is_ava
 
 # feature_flatten_dim = 2048
 # feature_flatten_dim = 1664
-feature_flatten_dim = 14848
+if conf.args.type == "beat_change":
+    feature_flatten_dim = 14848
+elif conf.args.type == "beat_type":
+    feature_flatten_dim = 66048
 if conf.args.feat_eng:
     input_channel_dim = 12
 else:

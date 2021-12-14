@@ -71,14 +71,14 @@ def drop_the_beat(type, dynamic):
 def main():
     #f = open("results/beats_211212_meta_re_lr0.1_feat_re.txt")
     # demo 3
-    f_dynamics = open("results/demo_beats_change_3_dynamic_t4.csv")
-    f_types = open("results/demo_beats_type_3.csv")
+    # f_dynamics = open("results/final/demo_beat_change_3_final.csv")
+    # f_types = open("results/final/demo_beat_type_3_final.csv")
     # # demo 4
-    # f_dynamics = open("results/demo_beats_change_3_dynamic.csv")
-    # f_types = open("results/demo_beats_type_3.csv")
+    # f_dynamics = open("results/final/demo_beat_change_4_final.csv")
+    # f_types = open("results/final/demo_beat_type_4_final.csv")
     # # demo 2
-    # f_dynamics = open("results/demo_beats_change_3_dynamic.csv")
-    # f_types = open("results/demo_beats_type_3.csv")
+    f_dynamics = open("results/final/demo_beat_change_2_final.csv")
+    f_types = open("results/final/demo_beat_type_2_final.csv")
 
     df = pd.read_csv(f_dynamics)
     beats = df['beats']

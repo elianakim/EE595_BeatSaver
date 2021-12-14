@@ -47,6 +47,9 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
         elif conf.args.beat_type == 4:
             self.data_per_class = {'Not Change': [], '4beats_1': [], '4beats_2': [], '4beats_3': [], '4beats_4': [], 'Change': []}
             cbin = {'Not Change': 0, '4beats_1': 0, '4beats_2': 0, '4beats_3': 0, '4beats_4': 0, 'Change': 0}
+        elif conf.args.beat_type == 2:
+            self.data_per_class = {'Not Change': [], '2beats_1': [], '2beats_2': [], 'Change': []}
+            cbin = {'Not Change': 0, '2beats_1': 0, '2beats_2': 0, 'Change': 0}
         self.class_labels = []
 
         pt = 0
@@ -54,14 +57,15 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
             bt = time.time()
             # decide label
             labels = self.df.iloc[pt : pt+WIN_LEN, opt['label_index']].values
-            # TODO: ADD DOMAIN. If domain has changed, skip the data
             # if beat change included in the window, label as 'Change'
             # else, 'Not Change'
             label = 'Not Change'
             for l in labels:
                 if l != 'None':
-                    label = l
-                    # label = 'Change'
+                    if conf.args.binary:
+                        label = 'Change'
+                    else:
+                        label = l
             cbin[label] += 1
             if RAW:
                 # process feature
@@ -78,18 +82,18 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                 raw_label = self.df.iloc[pt:pt + WIN_LEN, 6:7].values
 
                 feature = np.zeros((WIN_LEN, 12)) #[None] * WIN_LEN
-                feature_label = np.zeros((WIN_LEN, 1))
-
-                flag = False
-                cls = None
-                for i in range(WIN_LEN):
-                    if raw_label[i][0] != 'None':
-                        flag= True
-                        cls = self.class_to_number(raw_label[i][0])
-                if flag:
-                    feature_label = np.full((WIN_LEN, 1), cls)
-                else:
-                    feature_label = np.zeros((WIN_LEN, 1))
+                # feature_label = np.zeros((WIN_LEN, 1))
+                #
+                # flag = False
+                # cls = None
+                # for i in range(WIN_LEN):
+                #     if raw_label[i][0] != 'None':
+                #         flag= True
+                #         cls = self.class_to_number(raw_label[i][0])
+                # if flag:
+                #     feature_label = np.full((WIN_LEN, 1), cls)
+                # else:
+                #     feature_label = np.zeros((WIN_LEN, 1))
 
                 # Split raw data into acc and gyro
                 raw_acc = raw[0:WIN_LEN, 0:3]
@@ -124,8 +128,8 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                     feature = feature_scaled
 
             feature = feature.T
-            if not RAW:
-                feature_label = feature_label.T
+            # if not RAW:
+            #     feature_label = feature_label.T
 
             if conf.args.downsample:
                 self.data_per_class[label].append(feature)
@@ -146,7 +150,8 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
             for c in list(self.data_per_class.keys()):
                 # randomly sample data
                 if cbin[c] > minnumdata:
-                    sampled = random.sample(self.data_per_class[c], minnumdata)
+                    numdata = min(cbin[c], int(minnumdata * conf.args.downsample_ratio))
+                    sampled = random.sample(self.data_per_class[c], numdata)
                     self.features.extend(sampled)
                     for i in range(len(sampled)):
                         self.class_labels.append(self.class_to_number(c))
@@ -196,12 +201,15 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
         return self.dataset[idx]
 
     def class_to_number(self, label):
-        if conf.args.beat_type == 3:
+        if conf.args.binary:
+            dic = {'Not Change': 0,
+                   'Change': 1,
+                   }
+        elif conf.args.beat_type == 3: # not binary
             dic = {'Not Change': 0,
                    '3beats_1': 1,
                    '3beats_2': 2,
-                   '3beats_3':3
-                   # 'Change': 1,
+                   '3beats_3':3,
                    }
         elif conf.args.beat_type == 4:
             dic = {'Not Change': 0,
@@ -209,7 +217,12 @@ class BeatChange_Dataset(torch.utils.data.Dataset):
                    '4beats_2': 2,
                    '4beats_3': 3,
                    '4beats_4': 4,
-                    }
+                   }
+        elif conf.args.beat_type == 2:
+            dic = {'Not Change': 0,
+                   '2beats_1': 1,
+                   '2beats_2': 2,
+                   }
         return dic[label]
 
 if __name__ == '__main__':

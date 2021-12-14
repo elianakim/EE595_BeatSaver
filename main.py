@@ -37,16 +37,39 @@ def main():
 
     ################## Load default hyperparameter ##################
     if 'beat_change' in conf.args.type:
-        if conf.args.demo_produce:
-            if conf.args.beat_type == 3:
-                opt = conf.Beat3Change_Demo_Opt
-            elif conf.args.beat_type == 4:
-                opt = conf.Beat4Change_Demo_Opt
-        else:
-            if conf.args.beat_type == 3:
+        # if conf.args.demo_produce:
+        #     if conf.args.beat_type == 3:
+        #         if conf.args.binary:
+        #             opt = conf.Beat3Change_Demo_Binary_Opt
+        #         else:
+        #             opt = conf.Beat3Change_Demo_Opt
+        #     elif conf.args.beat_type == 4:
+        #         if conf.args.binary:
+        #             opt = conf.Beat4Change_Demo_Binary_Opt
+        #         else:
+        #             opt = conf.Beat4Change_Demo_Opt
+        #     elif conf.args.beat_type == 2:
+        #         if conf.args.binary:
+        #             opt = conf.Beat2Change_Demo_Binary_Opt
+        #         else:
+        #             opt = conf.Beat2Change_Demo_Opt
+        # else:
+        if conf.args.beat_type == 3:
+            if conf.args.binary:
+                opt = conf.Beat3Change_Binary_Opt
+            else:
                 opt = conf.Beat3Change_Opt
-            elif conf.args.beat_type == 4:
+        elif conf.args.beat_type == 4:
+            if conf.args.binary:
+                opt = conf.Beat4Change_Binary_Opt
+            else:
                 opt = conf.Beat4Change_Opt
+        elif conf.args.beat_type == 2:
+            if conf.args.binary:
+                opt = conf.Beat2Change_Binary_Opt
+            else:
+                opt = conf.Beat2Change_Demo_Opt
+
     elif 'beat_type' in conf.args.type:
         opt = conf.BeatType_Opt
 
@@ -54,8 +77,11 @@ def main():
         opt['learning_rate'] = conf.args.lr
     if conf.args.feat_eng:
         opt['raw'] = False
-    if conf.args.minmax:
+    if conf.args.scale:
         opt['scale'] = True
+    if conf.args.demo_produce:
+        opt['overlap_ratio'] = 1.0
+        opt['file_path'] = conf.args.load_demo_data_path
     conf.args.opt = opt
 
     ################## Load model ##################
@@ -76,11 +102,11 @@ def main():
     tensorboard = Tensorboard(log_path)
 
     if conf.args.method in ['Src']:
-        if conf.args.pca:
+        if conf.args.pca or conf.args.test_only:
             dataloader = data_loader.single_domain_data_loader(conf.args.opt['file_path'],
                                                                 batch_size=conf.args.opt['batch_size'],
                                                                 valid_split=0.1,
-                                                                test_split=0.1)
+                                                                test_split=0.8)
         else:
             dataloader = data_loader.single_domain_data_loader(conf.args.opt['file_path'],
                                                                batch_size=conf.args.opt['batch_size'],
@@ -188,8 +214,8 @@ def parse_arguments(argv):
                         help='which gpu to use')
     parser.add_argument('--feat_eng', action='store_true',
                         help='Whether to use feature engineering or not')
-    parser.add_argument('--minmax', action='store_true',
-                        help='Whether to use minmax scaling or not')
+    parser.add_argument('--scale', action='store_true',
+                        help='Whether to use std scaling or not')
 
     ### OPTIONAL ###
     parser.add_argument('--lr', type=float, default=None,
@@ -206,12 +232,23 @@ def parse_arguments(argv):
                         help='Remove checkpoints after evaluation')
     parser.add_argument('--downsample', action='store_true',
                         help='Whether to downsample or not')
+    parser.add_argument('--downsample_ratio', type=float, default=1.0,
+                        help='downsample_ratio * min_num_of_class will be the final data size.')
     parser.add_argument('--pca', action='store_true',
                         help='PCA Analysis Mode')
     parser.add_argument('--demo_produce', action='store_true',
                         help='for producing demo')
     parser.add_argument('--beat_type', type=int, default=3,
                         help='when training beat_change model, input the beat_type among 2, 3, 4. default = 3')
+    parser.add_argument('--binary', action='store_true',
+                        help='Whether to train binary classes (Change, Not Change in beat_change model')
+    parser.add_argument('--demo_final', action='store_true',
+                        help='produce final demo. You should include the beat labels of data beat type.')
+    parser.add_argument('--load_demo_data_path', type=str, default='',
+                        help='load the data to run demo')
+    parser.add_argument('--load_beat_path', type=str, default='',
+                        help='load the labels of data beat type in order to produce demo.')
+
     # parser.add_argument('--ensemble', action='store_true',
     #                     help='Whether to use ensemble models when evaluating.')
 

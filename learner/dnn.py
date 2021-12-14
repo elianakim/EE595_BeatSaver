@@ -139,7 +139,7 @@ class DNN():
 
     def log_accuracy_results(self, condition, suffix, epoch, cm_class):
 
-        assert (condition in ['valid', 'test'])
+        assert (condition in ['valid', 'test', 'demo'])
 
         class_accuracy = 100.0 * np.sum(np.diagonal(cm_class)) / np.sum(cm_class)
         self.tensorboard.log_scalar(condition + '/' + 'accuracy_class_' + suffix, class_accuracy, epoch)
@@ -315,8 +315,15 @@ class DNN():
         self.feature_extractor.eval()
         self.class_classifier.eval()
 
+        class_loss_sum = 0.0
+        class_cm_labeled_sum = 0
+        class_cm_test_data_sum = 0
+
         save_path = conf.args.load_checkpoint_path[:-3]
-        filename = 'beats.txt'
+        if conf.args.type == 'beat_type':
+            filename = 'beats_type.txt'
+        elif conf.args.type == 'beat_change':
+            filename = 'beats_change.txt'
         f = open(save_path+filename, 'w')
 
         num_iter = len(self.source_dataloader)
@@ -335,7 +342,18 @@ class DNN():
                 pred_label = preds_of_data.max(1, keepdim=False)[1]
                 write_str = str(batch_idx) + " , " + str(pred_label.item()) + "\n"
                 f.write(write_str)
+                class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
+                    self.class_classifier,
+                    self.class_criterion,
+                    feature_of_test_data,
+                    class_label_of_test_data
+                )
+                class_loss_sum += float(class_loss_of_test_data * input_of_test_data.size(0))
+                class_cm_test_data_sum += class_cm_test_data
         f.close()
+        epoch_avg_loss = self.log_loss_results('demo', epoch=0, loss_avg=class_loss_sum / num_iter)
+        class_accuracy_of_test_data = self.log_accuracy_results('demo', suffix='test', epoch=0,
+                                                                cm_class=class_cm_test_data_sum)
 
     def evaluation(self, epoch, condition):
 
@@ -362,19 +380,19 @@ class DNN():
                                                                             input_of_test_data.shape[1]))
                     self.feature_extractor.hidden = self.feature_extractor.init_hidden(batch_size=input_of_test_data.size(0))
                 feature_of_test_data = self.get_feature(self.feature_extractor, input_of_test_data)
-                class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
-                    self.class_classifier,
-                    self.class_criterion,
-                    feature_of_test_data,
-                    class_label_of_test_data)
-                # try:
-                #     class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
-                #                                                                     self.class_classifier,
-                #                                                                     self.class_criterion,
-                #                                                                     feature_of_test_data,
-                #                                                                     class_label_of_test_data)
-                # except:
-                #     print(feature_of_test_data.shape)
+                # class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
+                #     self.class_classifier,
+                #     self.class_criterion,
+                #     feature_of_test_data,
+                #     class_label_of_test_data)
+                try:
+                    class_loss_of_test_data, class_cm_test_data, _ = self.get_loss_and_confusion_matrix(
+                                                                                    self.class_classifier,
+                                                                                    self.class_criterion,
+                                                                                    feature_of_test_data,
+                                                                                    class_label_of_test_data)
+                except:
+                    print(feature_of_test_data.shape)
 
                 class_loss_sum += float(class_loss_of_test_data * input_of_test_data.size(0))
                 class_cm_test_data_sum += class_cm_test_data
