@@ -56,3 +56,29 @@ If you want to verify your installation, you can do simply with the following co
     $python main.py --dataset metasense_activity_scaled --method MetaSense --tgt PH0007-jskim --epoch 200 --log_suffix run_test_5shot_0.1  --src rest --train 1 --model MetaSense_Activity_model --nshot 5 --lr 0.1 
 
 CAUTION: For the *TrC* method, it requires a pre-trained *Src* model. Please make sure you have trained a Src model with the same `--log_suffix` argument before training a TrC instance. 
+
+## Misc.
+### 1.TensorBoard
+We support visualization (confusion matrix, train/valid/test loss and accuracy, etc.) and logging with [TensorBoard](https://www.tensorflow.org/tensorboard).
+
+Running train examples will automatically generate events files for TensorBoard. 
+
+You can check them by learning,
+for instance,
+
+    $tensorboard --logdir log/ --port 5000 --bind_all
+
+### 2. Checkpoint
+The code will save the validation best model (i.e., checkpoint) in the logging directory.
+
+For instance, `LOG_DIR/cp/cp_best.pth.tar`
+
+### 3. Result
+After the training, it will generate a result.txt file that provides the validation best accuracy and the test accuracy.
+ 
+For instance, `LOG_DIR/result.txt`
+
+Note that the result of PN, MAML, and MetaSense includes accuracy from given 1 to 10 shots in a single result.txt file, while the result of other methods includes only one accuracy for a specified shot through the argument.
+
+## Acknowledgement
+We imported the format of the project from [MetaSense_public](https://github.com/TaesikGong/MetaSense_public).
