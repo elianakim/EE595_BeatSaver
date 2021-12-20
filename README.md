@@ -85,11 +85,11 @@ Open [[this link](https://colab.research.google.com/drive/11zmhghSF33tl8GBEkA509
 
 You can preprocess data with the following command (in this case, 3/4 time signature with dynamics of forte):
     
-    $python data_process.py --imu_filepath path-to-raw-data --label_filepath path-to-label --sync_filepath path-to-sync.csv --output_suffix create_dataset --beats 3 --dynamics f
+    $ python data_process.py --imu_filepath path-to-raw-data --label_filepath path-to-label --sync_filepath path-to-sync.csv --output_suffix create_dataset --beats 3 --dynamics f
 
 Merge the preprocessed data into dataset. 
 
-    $python merge_data.py --regex .*create_dataset.* --dataset_name example_dataset
+    $ python merge_data.py --regex .*create_dataset.* --dataset_name example_dataset
 
 ## Training the Models
 Please refer to the `./script/train_models.sh` file. It contains running commands for various hyperparameters.
