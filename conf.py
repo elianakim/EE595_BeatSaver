@@ -43,7 +43,7 @@ Beat3Change_Opt = {
     'sampling_rate': 399,
     'seq_len': 133,
     'overlap_ratio': 0.5,
-    'file_path': './dataset/train_forte_4beats/accgyro.csv',
+    'file_path': './dataset/train_forte_3beats/accgyro.csv',
     'input_dim': 6,
     'learning_rate': 0.1,
     'weight_decay': 0.00001,

@@ -394,8 +394,6 @@ class DNN():
                 except:
                     print(feature_of_test_data.shape)
 
-                print(feature_of_test_data.shape)
-
                 class_loss_sum += float(class_loss_of_test_data * input_of_test_data.size(0))
                 class_cm_test_data_sum += class_cm_test_data
 

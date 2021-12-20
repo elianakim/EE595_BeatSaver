@@ -68,7 +68,7 @@ def main():
             if conf.args.binary:
                 opt = conf.Beat2Change_Binary_Opt
             else:
-                opt = conf.Beat2Change_Demo_Opt
+                opt = conf.Beat2Change_Opt
 
     elif 'beat_type' in conf.args.type:
         opt = conf.BeatType_Opt
