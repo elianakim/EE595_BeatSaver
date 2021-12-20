@@ -145,5 +145,5 @@ dependencies:
   - pip:
     - cython==0.29.22
     - dtaidistance==2.2.5
-prefix: /home/yewon/anaconda3/envs/aci
+prefix: /home/yewon/anaconda3/envs/beatsaver
 

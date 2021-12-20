@@ -1,8 +1,8 @@
 from pydub import AudioSegment
-from pydub.playback import play
-import re
+import argparse
 import time
 import os
+import sys
 import pandas as pd
 
 def drop_the_beat(type, dynamic):
@@ -68,17 +68,19 @@ def drop_the_beat(type, dynamic):
             print("   ######              ######              ######              ######           ")
 
 
-def main():
-    #f = open("results/beats_211212_meta_re_lr0.1_feat_re.txt")
-    # demo 3
-    # f_dynamics = open("results/final/demo_beat_change_3_final.csv")
-    # f_types = open("results/final/demo_beat_type_3_final.csv")
-    # # demo 4
-    # f_dynamics = open("results/final/demo_beat_change_4_final.csv")
-    # f_types = open("results/final/demo_beat_type_4_final.csv")
-    # # demo 2
-    f_dynamics = open("results/final/demo_beat_change_2_final.csv")
-    f_types = open("results/final/demo_beat_type_2_final.csv")
+def main(args):
+    if args.beat == 3:
+        # demo 3
+        f_dynamics = open("results/final/demo_beat_change_3_final.csv")
+        f_types = open("results/final/demo_beat_type_3_final.csv")
+    elif args.beat == 4:
+        # demo 4
+        f_dynamics = open("results/final/demo_beat_change_4_final.csv")
+        f_types = open("results/final/demo_beat_type_4_final.csv")
+    elif args.beat == 2:
+        # demo 2
+        f_dynamics = open("results/final/demo_beat_change_2_final.csv")
+        f_types = open("results/final/demo_beat_type_2_final.csv")
 
     df = pd.read_csv(f_dynamics)
     beats = df['beats']
@@ -94,9 +96,6 @@ def main():
         beat = int(values[1])
         beats.append(beat)
     '''
-    beep = AudioSegment.from_mp3("tick.mp3")
-    beep = beep[0: len(beep) / 3.5]
-
     os.system('clear')
 
     #for beat in beats:
@@ -121,5 +120,14 @@ def main():
         else: # beat is 0
             # wait for 330ms
             time.sleep(0.33)
+
+def parse_arguments(argv):
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--beat', type=int, default=2,
+                        help='Time signature to play. [2, 3, 4].')
+    return parser.parse_args()
+
 if __name__ == '__main__':
-    main()
+    args = parse_arguments(sys.argv[1:])
+    main(args)

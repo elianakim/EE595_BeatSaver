@@ -130,7 +130,7 @@ class DNN():
 
     def log_loss_results(self, condition, epoch, loss_avg):
 
-        self.tensorboard.log_scalar(condition + '/loss_sum', loss_avg, epoch)
+        # self.tensorboard.log_scalar(condition + '/loss_sum', loss_avg, epoch)
 
         # print loss
         print('{:s}: [epoch : {:d}]\tLoss: {:.6f} \t'.format(condition, epoch, loss_avg))
@@ -142,11 +142,11 @@ class DNN():
         assert (condition in ['valid', 'test', 'demo'])
 
         class_accuracy = 100.0 * np.sum(np.diagonal(cm_class)) / np.sum(cm_class)
-        self.tensorboard.log_scalar(condition + '/' + 'accuracy_class_' + suffix, class_accuracy, epoch)
+        # self.tensorboard.log_scalar(condition + '/' + 'accuracy_class_' + suffix, class_accuracy, epoch)
 
         print('[epoch:{:d}] {:s} {:s} class acc: {:.3f}'.format(epoch, condition, suffix, class_accuracy))
-        self.tensorboard.log_confusion_matrix(condition + '_accuracy_class_' + suffix, cm_class,
-                                              conf.args.opt['classes'], epoch)
+        # self.tensorboard.log_confusion_matrix(condition + '_accuracy_class_' + suffix, cm_class,
+        #                                       conf.args.opt['classes'], epoch)
 
         return class_accuracy
 
@@ -393,6 +393,8 @@ class DNN():
                                                                                     class_label_of_test_data)
                 except:
                     print(feature_of_test_data.shape)
+
+                print(feature_of_test_data.shape)
 
                 class_loss_sum += float(class_loss_of_test_data * input_of_test_data.size(0))
                 class_cm_test_data_sum += class_cm_test_data

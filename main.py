@@ -6,7 +6,7 @@ import time
 
 import numpy as np
 import torch
-from tensorboard_logger import Tensorboard
+# from tensorboard_logger import Tensorboard
 
 import conf
 
@@ -99,7 +99,8 @@ def main():
     from data_loader import data_loader as data_loader
     from learner.dnn import DNN
     result_path, checkpoint_path, log_path = get_path()
-    tensorboard = Tensorboard(log_path)
+    tensorboard = None
+    # tensorboard = Tensorboard(log_path) # temporarily disable
 
     if conf.args.method in ['Src']:
         if conf.args.pca or conf.args.test_only:
@@ -138,11 +139,11 @@ def main():
                     oldumask = os.umask(0)
                     os.makedirs(checkpoint_path, 0o777)
                     os.umask(oldumask)
-                # tensorboard
-                for arg in vars(conf.args):
-                    tensorboard.log_text('args/' + arg, getattr(conf.args, arg), 0)
-                script = ' '.join(sys.argv[1:])
-                tensorboard.log_text('args/script', script, 0)
+                # # tensorboard
+                # for arg in vars(conf.args):
+                #     tensorboard.log_text('args/' + arg, getattr(conf.args, arg), 0)
+                # script = ' '.join(sys.argv[1:])
+                # tensorboard.log_text('args/script', script, 0)
 
                 # initial validation
                 epoch_acc, epoch_loss, _ = learner.test(0)
