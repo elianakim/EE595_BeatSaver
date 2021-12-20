@@ -223,7 +223,7 @@ def parse_arguments(argv):
                         help='learning rate to overwrite conf.py')
     parser.add_argument('--seed', type=int, default=0,
                         help='random seed')
-    parser.add_argument('--epoch', type=int, default=200,
+    parser.add_argument('--epoch', type=int, default=5,
                         help='How many epochs do you want to use for train')
     parser.add_argument('--load_checkpoint_path', type=str, default='',
                         help='Load checkpoint and train from checkpoint in path?')

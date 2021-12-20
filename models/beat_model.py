@@ -9,12 +9,11 @@ import conf
 device = torch.device("cuda:{:d}".format(conf.args.gpu_idx) if torch.cuda.is_available() else "cpu")
 # device = torch.device("cuda:{:d}".format(0) if torch.cuda.is_available() else "cpu")
 
-# feature_flatten_dim = 2048
-# feature_flatten_dim = 1664
 if conf.args.type == "beat_change":
     feature_flatten_dim = 14848
 elif conf.args.type == "beat_type":
     feature_flatten_dim = 32256
+
 if conf.args.feat_eng:
     input_channel_dim = 12
 else:
