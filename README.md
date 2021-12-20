@@ -21,11 +21,15 @@ We tested our codes under this environment.
 We use [Conda environment](https://docs.conda.io/)
 You can get conda by installing [Anaconda](https://www.anaconda.com/) first.
 
-We share our python environment that contains all required python packages. Please refer to the './beatsaver.yml' file.
+We share our python environment that contains all required python packages. Please refer to the './environment.yml' file.
 
 You can import our environment using conda:
 
-    conda env create -f beatsaver.yml -n beatsaver
+    $ conda env create -f environment.yml -n beatsaver
+    
+Activate the environment by the following command:
+
+    $ conda activate beatsaver
    
 Reference: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 
