@@ -87,7 +87,7 @@ Merge the preprocessed data into dataset.
 
     $python merge_data.py --regex .*create_dataset.* --dataset_name example_dataset
 
-## Training The Models
+## Training the Models
 Please refer to the `./script/train_models.sh` file. It contains running commands for various hyperparameters.
 
 Run the following command to train models. 
