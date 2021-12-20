@@ -29,15 +29,29 @@ You can import our environment using conda:
    
 Reference: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 
-## Quick Guide for Demo (for TAs)
+## Quick Guide for Evaluation (for TAs)
 We first provide the quick guide for course TAs to evaluate our project, since the full reproduction of our project (from model training) takes more than several hours. 
+
 
 ### Evaluating Demo
 
+Instead of uploading all models, we provide two example model checkpoints for Time Signature Classifier and Beat Detector since the trained models are large in size.
 
+To test Time Signature Classifier, run the following code:
+
+    $ python main.py --type beat_type --dataset beat_original --model beat_type_model --method Demo --load_checkpoint_path ./something --demo_produce --feat_eng --load_demo_data_path ./something/accgyro.csv
+    
+To test Beat Detector, run the following code:
+
+    $ python main.py --type beat_change --dataset beat_original --model beat_change_model --method Demo --load_checkpoint_path /mnt/sting/yewon/EE595_BeatSaver/log/beat_original/Src/211212_meta_re_lr0.1_feat_re/cp/ --demo_produce --feat_eng --load_demo_data_path /mnt/sting/yewon/EE595_BeatSaver/dataset/20211213_demo_3/accgyro.csv --beat_type 3
 
 ### Playing Demo
 
+To run the demo, run the following codes:
+
+    $ python demo.py --beat 2
+    $ python demo.py --beat 3
+    $ python demo.py --beat 4
 
 Below, we describe the details of the project, including guidelines to preprocess/use dataset, train models, and producing beats outputs for further references.
 
