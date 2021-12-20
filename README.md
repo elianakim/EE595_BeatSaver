@@ -29,6 +29,18 @@ You can import our environment using conda:
    
 Reference: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 
+## Quick Guide for Demo (for TAs)
+We first provide the quick guide for course TAs to evaluate our project, since the full reproduction of our project (from model training) takes more than several hours. 
+
+### Evaluating Demo
+
+
+
+### Playing Demo
+
+
+Below, we describe the details of the project, including guidelines to preprocess/use dataset, train models, and producing beats outputs for further references.
+
 ## Dataset
 
 ### Use Our Preprocessed Dataset
@@ -69,27 +81,15 @@ If you want to verify your installation, you can do simply with the following co
 CAUTION: For the *TrC* method, it requires a pre-trained *Src* model. Please make sure you have trained a Src model with the same `--log_suffix` argument before training a TrC instance. 
 
 ## Misc.
-### 1.TensorBoard
-We support visualization (confusion matrix, train/valid/test loss and accuracy, etc.) and logging with [TensorBoard](https://www.tensorflow.org/tensorboard).
-
-Running train examples will automatically generate events files for TensorBoard. 
-
-You can check them by learning,
-for instance,
-
-    $tensorboard --logdir log/ --port 5000 --bind_all
-
-### 2. Checkpoint
+### 1. Checkpoint
 The code will save the validation best model (i.e., checkpoint) in the logging directory.
 
 For instance, `LOG_DIR/cp/cp_best.pth.tar`
 
-### 3. Result
+### 2. Result
 After the training, it will generate a result.txt file that provides the validation best accuracy and the test accuracy.
  
 For instance, `LOG_DIR/result.txt`
-
-Note that the result of PN, MAML, and MetaSense includes accuracy from given 1 to 10 shots in a single result.txt file, while the result of other methods includes only one accuracy for a specified shot through the argument.
 
 ## Acknowledgement
 We imported the format of the project from [MetaSense_public](https://github.com/TaesikGong/MetaSense_public).
