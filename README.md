@@ -31,22 +31,33 @@ Reference: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manag
 
 ## Dataset
 
-### Download Preprocessed Dataset
-We provide our preprocessed datasets in a csv format [[here](https://drive.google.com/drive/folders/1Fu6KItvxJ2z-gB8PKpuzB7N6gX8Wo0NB?usp=sharing)]
-* ichar_minmax_scaling_all.csv: minmax-scaled (0-1) ICHAR dataset used in our experiment  
-* icsr_minmax_scaling_all.csv: minmax-scaled (0-1) ICSR dataset used in our experiment
-* hhar_minmax_scaling_all.csv: minmax-scaled (0-1) HHAR dataset used in our experiment
-* dsa_minmax_scaling_all.csv: minmax-scaled (0-1) DSA dataset used in our experiment
-* ichar_original_all.csv: ICHAR dataset before scaling (for different purposes)
-* icsr_original_all.csv: ICSR dataset before scaling (for different purposes)
-
-To run our codes, you first need to download at least one of the datasets. After that, make a directory for the datasets:
-
-    $cd .               #project root
-    $mkdir dataset
-and locate them in the `./dataset/` directory.
+### Use Our Preprocessed Dataset
+We provide our preprocessed datasets in a csv format [[here](https://github.com/elianakim/EE595_BeatSaver/tree/main/dataset)]
+IMU data are named as "accgyro.csv".
+* train_all: train dataset including all time signatures for training Time Signature Classifier
+* train_forte_2beats: train dataset for time signature of 2/4 and dynamics of forte.
+* train_forte_3beats: train dataset for time signature of 3/4 and dynamics of forte.
+* train_forte_4beats: train dataset for time signature of 4/4 and dynamics of forte.
+* train_piano_2beats: train dataset for time signature of 2/4 and dynamics of piano.
+* train_piano_3beats: train dataset for time signature of 3/4 and dynamics of piano.
+* train_piano_4beats: train dataset for time signature of 4/4 and dynamics of piano.
+* demo_2beats: test dataset for time signature of 2/4 with varying dynamics.
+* demo_3beats: test dataset for time signature of 3/4 with varying dynamics.
+* demo_4beats: test dataset for time signature of 4/4 with varying dynamics.
 
 ### Create Your Own Dataset
+
+Prepare raw data and label in the *rawdata* folder. 
+
+Open [[this link](https://colab.research.google.com/drive/11zmhghSF33tl8GBEkA5091RSE1tDs3Ov?usp=sharing)] to synchronize the data. To be specific, find the index of the raw data where the synchronization pulses end. Write the information with the path to raw data in sync.csv in the *rawdata* folder.
+
+You can preprocess data with the following command (in this case, 3/4 time signature with dynamics of forte):
+    
+    $python data_process.py --imu_filepath path-to-raw-data --label_filepath path-to-label --sync_filepath path-to-sync.csv --output_suffix create_dataset --beats 3 --dynamics f
+
+Merge the preprocessed data into dataset. 
+
+    $python merge_data.py --regex .*create_dataset.* --dataset_name example_dataset
 
 ## How to Run
 Please refer to the `./run.sh` file. It contains running commands for all methods, datasets, and number of shots.
