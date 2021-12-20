@@ -35,15 +35,17 @@ We first provide the quick guide for course TAs to evaluate our project, since t
 
 ### Evaluating Demo
 
-Instead of uploading all models, we provide two example model checkpoints for Time Signature Classifier and Beat Detector since the trained models are large in size.
+Instead of uploading all models, we provide two example model checkpoints for Time Signature Classifier and Beat Detector since the trained models are large in size. Please download the directory containing files and extract it in the project directory: [[download](https://drive.google.com/file/d/1HkcW_KWUMJodKP3V-QmiXAV9oRYl5dBx/view?usp=sharing)]
 
 To test Time Signature Classifier, run the following code:
 
-    $ python main.py --type beat_type --dataset beat_original --model beat_type_model --method Demo --load_checkpoint_path ./something --demo_produce --feat_eng --load_demo_data_path ./something/accgyro.csv
+    $ python main.py --type beat_type --dataset beat_original --model beat_type_model --method Demo --load_checkpoint_path  ./checkpoints/time_signature_classifier/cp/ --demo_produce --feat_eng --load_demo_data_path ./dataset/demo_2beats/accgyro.csv
+    $ python main.py --type beat_type --dataset beat_original --model beat_type_model --method Demo --load_checkpoint_path  ./checkpoints/time_signature_classifier/cp/ --demo_produce --feat_eng --load_demo_data_path ./dataset/demo_3beats/accgyro.csv
+    $ python main.py --type beat_type --dataset beat_original --model beat_type_model --method Demo --load_checkpoint_path  ./checkpoints/time_signature_classifier/cp/ --demo_produce --feat_eng --load_demo_data_path ./dataset/demo_4beats/accgyro.csv
     
 To test Beat Detector, run the following code:
 
-    $ python main.py --type beat_change --dataset beat_original --model beat_change_model --method Demo --load_checkpoint_path /mnt/sting/yewon/EE595_BeatSaver/log/beat_original/Src/211212_meta_re_lr0.1_feat_re/cp/ --demo_produce --feat_eng --load_demo_data_path /mnt/sting/yewon/EE595_BeatSaver/dataset/20211213_demo_3/accgyro.csv --beat_type 3
+    $ python main.py --type beat_change --dataset beat_original --model beat_change_model --method Demo --load_checkpoint_path ./checkpoints/beat_detector/cp/ --demo_produce --feat_eng --load_demo_data_path ./dataset/demo_3beats/accgyro.csv --beat_type 3
 
 ### Playing Demo
 
@@ -85,14 +87,14 @@ Merge the preprocessed data into dataset.
 
     $python merge_data.py --regex .*create_dataset.* --dataset_name example_dataset
 
-## How to Run
-Please refer to the `./run.sh` file. It contains running commands for all methods, datasets, and number of shots.
+## Training The Models
+Please refer to the `./script/train_models.sh` file. It contains running commands for various hyperparameters.
 
-If you want to verify your installation, you can do simply with the following command:
+Run the following command to train models. 
+
+    $ . script/train_models.sh
     
-    $python main.py --dataset metasense_activity_scaled --method MetaSense --tgt PH0007-jskim --epoch 200 --log_suffix run_test_5shot_0.1  --src rest --train 1 --model MetaSense_Activity_model --nshot 5 --lr 0.1 
-
-CAUTION: For the *TrC* method, it requires a pre-trained *Src* model. Please make sure you have trained a Src model with the same `--log_suffix` argument before training a TrC instance. 
+Using the models, you can produce the demo results and play demo as described in the quick guide for evaluation.
 
 ## Misc.
 ### 1. Checkpoint
