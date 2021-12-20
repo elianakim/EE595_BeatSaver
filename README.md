@@ -60,7 +60,7 @@ Below, we describe the details of the project, including guidelines to preproces
 ## Dataset
 
 ### Use Our Preprocessed Dataset
-We provide our preprocessed datasets in a csv format [[here](https://github.com/elianakim/EE595_BeatSaver/tree/main/dataset)]
+We provide our preprocessed datasets in a csv format [[here](https://github.com/elianakim/EE595_BeatSaver/tree/main/dataset)]. 
 IMU data are named as "accgyro.csv".
 * train_all: train dataset including all time signatures for training Time Signature Classifier
 * train_forte_2beats: train dataset for time signature of 2/4 and dynamics of forte.
