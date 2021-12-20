@@ -35,7 +35,7 @@ We first provide the quick guide for course TAs to evaluate our project, since t
 
 ### Evaluating Demo
 
-Instead of uploading all models, we provide two example model checkpoints for Time Signature Classifier and Beat Detector since the trained models are large in size.
+Instead of uploading all models, we provide two example model checkpoints for Time Signature Classifier and Beat Detector since the trained models are large in size. Please download the directory containing files and extract it in the project directory: [[download](https://drive.google.com/file/d/1HkcW_KWUMJodKP3V-QmiXAV9oRYl5dBx/view?usp=sharing)]
 
 To test Time Signature Classifier, run the following code:
 
