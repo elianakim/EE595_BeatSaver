@@ -25,7 +25,11 @@ We share our python environment that contains all required python packages. Plea
 
 You can import our environment using conda:
 
-    conda env create -f beatsaver.yml -n beatsaver
+    $ conda env create -f environment.yml -n beatsaver
+    
+Activate the environment by the following command:
+
+    $ conda activate beatsaver
    
 Reference: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file
 
