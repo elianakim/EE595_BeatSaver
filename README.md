@@ -88,13 +88,13 @@ Merge the preprocessed data into dataset.
     $python merge_data.py --regex .*create_dataset.* --dataset_name example_dataset
 
 ## Training The Models
-Please refer to the `./run.sh` file. It contains running commands for all methods, datasets, and number of shots.
+Please refer to the `./script/train_models.sh` file. It contains running commands for various hyperparameters.
 
-If you want to verify your installation, you can do simply with the following command:
+Run the following command to train models. 
+
+    $ . script/train_models.sh
     
-    $python main.py --dataset metasense_activity_scaled --method MetaSense --tgt PH0007-jskim --epoch 200 --log_suffix run_test_5shot_0.1  --src rest --train 1 --model MetaSense_Activity_model --nshot 5 --lr 0.1 
-
-CAUTION: For the *TrC* method, it requires a pre-trained *Src* model. Please make sure you have trained a Src model with the same `--log_suffix` argument before training a TrC instance. 
+Using the models, you can produce the demo results and play demo as described in the quick guide for evaluation.
 
 ## Misc.
 ### 1. Checkpoint
